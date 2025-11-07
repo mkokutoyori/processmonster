@@ -347,44 +347,78 @@
 ---
 
 ## 📝 Phase 7 - Formulaires Dynamiques
-**Statut:** ⏳ Planifié
-**Début estimé:** Après Phase 6
-**Fin estimée:** -
+**Statut:** ✅ Terminé
+**Début:** 2025-11-07
+**Fin:** 2025-11-07
 
 ### Tâches Backend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Entity FormDefinition | ⏳ | - | JSON schema formulaire |
-| Entity FormSubmission | ⏳ | - | Données soumises |
-| Service FormService | ⏳ | - | CRUD formulaires |
-| Service FormValidationService | ⏳ | - | Validation côté serveur |
-| Controller FormController | ⏳ | - | REST API |
-| Endpoint POST /api/forms | ⏳ | - | Créer formulaire |
-| Endpoint GET /api/forms/{id} | ⏳ | - | Récupérer config |
-| Endpoint POST /api/forms/{id}/validate | ⏳ | - | Valider données |
-| Endpoint POST /api/forms/{id}/submit | ⏳ | - | Soumettre |
-| Support types de champs (text, number, date, select, checkbox, file, etc.) | ⏳ | - | JSON schema |
-| Validation règles (required, min, max, pattern, custom) | ⏳ | - | JSR-380 dynamique |
-| Champs conditionnels | ⏳ | - | Show/hide basé sur valeurs |
-| Auto-save brouillons | ⏳ | - | Sauvegarde automatique |
+| Entity FormDefinition | ✅ | 2025-11-07 | id, formKey, name, version, schemaJson, uiSchemaJson, published, isLatestVersion |
+| Entity FormSubmission | ✅ | 2025-11-07 | id, formDefinition, task, processInstance, dataJson, status, validationErrors |
+| Entity SubmissionStatus | ✅ | 2025-11-07 | Enum: DRAFT, SUBMITTED, APPROVED, REJECTED, CANCELLED |
+| Repository FormDefinitionRepository | ✅ | 2025-11-07 | 15+ query methods (latest version, published, search) |
+| Repository FormSubmissionRepository | ✅ | 2025-11-07 | 17+ query methods (by status, submitted by, pending) |
+| Service FormService | ✅ | 2025-11-07 | 25+ methods - CRUD, versioning, draft/submit, approve/reject |
+| Service FormValidationService | ✅ | 2025-11-07 | JSON Schema Draft 7 validation via networknt library |
+| DTOs (6 total) | ✅ | 2025-11-07 | FormDefinitionDTO, CreateFormDefinitionDTO, UpdateFormDefinitionDTO, FormSubmissionDTO, SaveDraftDTO, SubmitFormDTO |
+| Mapper FormMapper | ✅ | 2025-11-07 | MapStruct entity-DTO mapping (7 methods) |
+| Controller FormController | ✅ | 2025-11-07 | 26 REST endpoints avec OpenAPI docs |
+| Endpoint POST /api/v1/forms/definitions | ✅ | 2025-11-07 | Créer définition formulaire |
+| Endpoint PUT /api/v1/forms/definitions/{id} | ✅ | 2025-11-07 | Update avec auto-versioning si schema change |
+| Endpoint GET /api/v1/forms/definitions | ✅ | 2025-11-07 | Liste paginée (latestOnly param) |
+| Endpoint GET /api/v1/forms/definitions/{id} | ✅ | 2025-11-07 | Détails définition |
+| Endpoint GET /api/v1/forms/definitions/key/{key} | ✅ | 2025-11-07 | Récupérer par formKey (latest version) |
+| Endpoint POST /api/v1/forms/definitions/validate-schema | ✅ | 2025-11-07 | Valider JSON Schema |
+| Endpoint PUT /api/v1/forms/definitions/{id}/publish | ✅ | 2025-11-07 | Publier/dépublier |
+| Endpoint GET /api/v1/forms/definitions/published | ✅ | 2025-11-07 | Forms publiés uniquement |
+| Endpoint POST /api/v1/forms/submissions/draft | ✅ | 2025-11-07 | Sauvegarder brouillon (no validation) |
+| Endpoint POST /api/v1/forms/submissions/submit | ✅ | 2025-11-07 | Soumettre avec validation complète |
+| Endpoint PUT /api/v1/forms/submissions/{id}/approve | ✅ | 2025-11-07 | Approuver submission |
+| Endpoint PUT /api/v1/forms/submissions/{id}/reject | ✅ | 2025-11-07 | Rejeter submission |
+| Endpoint GET /api/v1/forms/submissions/my-submissions | ✅ | 2025-11-07 | Mes soumissions |
+| Endpoint GET /api/v1/forms/submissions/pending-review | ✅ | 2025-11-07 | En attente d'approbation |
+| Auto-versioning | ✅ | 2025-11-07 | Nouvelle version auto si schemaJson change |
+| Support JSON Schema Draft 7 | ✅ | 2025-11-07 | Types: string, number, integer, boolean, array, object |
+| Validation règles complètes | ✅ | 2025-11-07 | required, minLength, maxLength, minimum, maximum, pattern, format, enum, const |
+| Champs conditionnels | ✅ | 2025-11-07 | JSON Schema if/then/else (voir wire-transfer example) |
+| Draft vs. Submit distinction | ✅ | 2025-11-07 | Draft: JSON format check only, Submit: full schema validation |
+| Tests unitaires FormService | ✅ | 2025-11-07 | 18 tests JUnit 5 + Mockito (versioning, validation, lifecycle) |
+| Tests intégration FormController | ✅ | 2025-11-07 | 24 tests @SpringBootTest + MockMvc (endpoints, security) |
+| Messages i18n FR/EN | ✅ | 2025-11-07 | 40 messages form.* en français et anglais |
+| Dépendance json-schema-validator | ✅ | 2025-11-07 | networknt:json-schema-validator:1.0.87 |
 
 ### Tâches Frontend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Service FormService | ⏳ | - | API calls |
-| Composant FormBuilder | ⏳ | - | Drag & drop builder |
-| Composant FormRenderer | ⏳ | - | Rendu dynamique |
-| Composant field types (text, number, date, etc.) | ⏳ | - | Components réutilisables |
-| Validation client (Reactive Forms) | ⏳ | - | Sync avec validation serveur |
+| Models TypeScript | ✅ | 2025-11-07 | 12 interfaces: FormDefinition, FormSubmission, FormSchema, FormSchemaProperty, UISchema, etc. |
+| Service FormService | ✅ | 2025-11-07 | 24 méthodes API + 4 helpers (parseSchema, stringifyFormData, etc.) |
+| Composant FormBuilder | ⏳ | - | À implémenter Phase suivante |
+| Composant FormRenderer | ⏳ | - | À implémenter Phase suivante |
+| Composant field types (text, number, date, etc.) | ⏳ | - | À implémenter Phase suivante |
+| Validation client (Reactive Forms) | ⏳ | - | À implémenter Phase suivante |
 | Gestion champs conditionnels | ⏳ | - | RxJS pour réactivité |
 | Auto-save | ⏳ | - | Debounce + localStorage |
 | Preview formulaire | ⏳ | - | Mode aperçu |
 
+### Example Schemas
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Loan Application Schema | ✅ | 2025-11-07 | 30+ properties, co-applicant support, conditional logic |
+| Account Opening Schema | ✅ | 2025-11-07 | 35+ properties, ID verification, citizenship, initial deposit |
+| Wire Transfer Schema | ✅ | 2025-11-07 | 30+ properties, multi-currency, SWIFT/routing, AML/KYC, if/then/else |
+| README Documentation | ✅ | 2025-11-07 | Usage guide, customization, compliance considerations |
+
 ### Décisions techniques
-- **Schema:** JSON Schema Draft 7 pour définition formulaires
-- **Builder:** Bibliothèque formio.js ou custom drag & drop
-- **Validation:** Même règles côté client (Angular) et serveur (Bean Validation)
-- **Auto-save:** Debounce 2s, localStorage, sync avec backend
+- **Schema:** JSON Schema Draft 7 avec validation networknt/json-schema-validator:1.0.87
+- **Versioning:** Auto-incrémentation version quand schemaJson change, flag isLatestVersion
+- **Draft vs. Submit:** saveDraft() = JSON format check only, submitForm() = full validation
+- **Workflow:** DRAFT → SUBMITTED → APPROVED/REJECTED/CANCELLED
+- **UI Schema:** Support uiSchemaJson pour hints de rendu (ui:widget, ui:placeholder, etc.)
+- **Conditional Fields:** JSON Schema if/then/else pour champs conditionnels
+- **Frontend Builder:** À implémenter avec formio.js ou custom drag & drop (Phase future)
+- **Compliance:** Schemas incluent champs KYC, AML, PATRIOT Act, FCRA, E-Sign Act
+- **Security:** RBAC @PreAuthorize (FORM_READ, FORM_CREATE, FORM_UPDATE, FORM_DELETE)
 
 ---
 

@@ -1,0 +1,218 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Account Opening Form",
+  "description": "Form for opening a new bank account",
+  "type": "object",
+  "required": [
+    "accountType",
+    "firstName",
+    "lastName",
+    "email",
+    "phone",
+    "dateOfBirth",
+    "ssn",
+    "citizenship",
+    "addressLine1",
+    "city",
+    "state",
+    "zipCode",
+    "initialDeposit",
+    "agreedToTerms"
+  ],
+  "properties": {
+    "accountType": {
+      "type": "string",
+      "title": "Account Type",
+      "enum": ["checking", "savings", "money-market", "cd"],
+      "description": "Select the type of account you want to open"
+    },
+    "accountOwnership": {
+      "type": "string",
+      "title": "Account Ownership",
+      "enum": ["individual", "joint", "business"],
+      "default": "individual"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "First Name",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "lastName": {
+      "type": "string",
+      "title": "Last Name",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Middle Name",
+      "maxLength": 50
+    },
+    "suffix": {
+      "type": "string",
+      "title": "Suffix",
+      "enum": ["", "Jr.", "Sr.", "II", "III", "IV"]
+    },
+    "email": {
+      "type": "string",
+      "title": "Email Address",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Primary Phone Number",
+      "pattern": "^[0-9]{10}$"
+    },
+    "alternatePhone": {
+      "type": "string",
+      "title": "Alternate Phone Number",
+      "pattern": "^[0-9]{10}$"
+    },
+    "dateOfBirth": {
+      "type": "string",
+      "title": "Date of Birth",
+      "format": "date"
+    },
+    "ssn": {
+      "type": "string",
+      "title": "Social Security Number",
+      "pattern": "^[0-9]{9}$",
+      "description": "9 digits, no dashes"
+    },
+    "citizenship": {
+      "type": "string",
+      "title": "Citizenship Status",
+      "enum": ["us-citizen", "permanent-resident", "non-resident-alien"]
+    },
+    "idType": {
+      "type": "string",
+      "title": "ID Type",
+      "enum": ["drivers-license", "state-id", "passport", "military-id"]
+    },
+    "idNumber": {
+      "type": "string",
+      "title": "ID Number",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "idState": {
+      "type": "string",
+      "title": "ID Issuing State",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "idExpirationDate": {
+      "type": "string",
+      "title": "ID Expiration Date",
+      "format": "date"
+    },
+    "addressLine1": {
+      "type": "string",
+      "title": "Address Line 1",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "addressLine2": {
+      "type": "string",
+      "title": "Address Line 2",
+      "maxLength": 200
+    },
+    "city": {
+      "type": "string",
+      "title": "City",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "state": {
+      "type": "string",
+      "title": "State",
+      "pattern": "^[A-Z]{2}$"
+    },
+    "zipCode": {
+      "type": "string",
+      "title": "ZIP Code",
+      "pattern": "^[0-9]{5}$"
+    },
+    "mailingAddressSame": {
+      "type": "boolean",
+      "title": "Mailing address same as physical address?",
+      "default": true
+    },
+    "employmentStatus": {
+      "type": "string",
+      "title": "Employment Status",
+      "enum": ["employed", "self-employed", "retired", "student", "unemployed"]
+    },
+    "employer": {
+      "type": "string",
+      "title": "Employer Name",
+      "maxLength": 100
+    },
+    "occupation": {
+      "type": "string",
+      "title": "Occupation",
+      "maxLength": 100
+    },
+    "initialDeposit": {
+      "type": "number",
+      "title": "Initial Deposit Amount (USD)",
+      "minimum": 25,
+      "maximum": 1000000,
+      "description": "Minimum $25 required"
+    },
+    "fundingSource": {
+      "type": "string",
+      "title": "Source of Initial Deposit",
+      "enum": [
+        "checking-account",
+        "savings-account",
+        "cash",
+        "check",
+        "wire-transfer",
+        "other"
+      ]
+    },
+    "requestDebitCard": {
+      "type": "boolean",
+      "title": "Request a debit card?",
+      "default": true
+    },
+    "requestChecks": {
+      "type": "boolean",
+      "title": "Request checks?",
+      "default": false
+    },
+    "checksQuantity": {
+      "type": "integer",
+      "title": "Number of checks",
+      "enum": [0, 50, 100, 200],
+      "default": 0
+    },
+    "enrollOnlineBanking": {
+      "type": "boolean",
+      "title": "Enroll in online banking?",
+      "default": true
+    },
+    "enrollMobileBanking": {
+      "type": "boolean",
+      "title": "Enroll in mobile banking?",
+      "default": true
+    },
+    "paperlessStatements": {
+      "type": "boolean",
+      "title": "Opt for paperless statements?",
+      "default": true
+    },
+    "agreedToTerms": {
+      "type": "boolean",
+      "title": "I agree to the account terms and conditions",
+      "const": true
+    },
+    "agreedToPrivacyPolicy": {
+      "type": "boolean",
+      "title": "I agree to the privacy policy",
+      "const": true
+    }
+  },
+  "additionalProperties": false
+}

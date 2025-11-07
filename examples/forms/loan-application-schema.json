@@ -1,0 +1,207 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Loan Application Form",
+  "description": "Form for personal loan applications",
+  "type": "object",
+  "required": [
+    "applicantType",
+    "firstName",
+    "lastName",
+    "email",
+    "phone",
+    "dateOfBirth",
+    "ssn",
+    "employmentStatus",
+    "annualIncome",
+    "loanAmount",
+    "loanPurpose",
+    "loanTerm",
+    "addressLine1",
+    "city",
+    "state",
+    "zipCode",
+    "agreedToTerms"
+  ],
+  "properties": {
+    "applicantType": {
+      "type": "string",
+      "title": "Applicant Type",
+      "enum": ["individual", "joint"],
+      "default": "individual"
+    },
+    "firstName": {
+      "type": "string",
+      "title": "First Name",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "lastName": {
+      "type": "string",
+      "title": "Last Name",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "middleName": {
+      "type": "string",
+      "title": "Middle Name",
+      "maxLength": 50
+    },
+    "email": {
+      "type": "string",
+      "title": "Email Address",
+      "format": "email"
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone Number",
+      "pattern": "^[0-9]{10}$"
+    },
+    "dateOfBirth": {
+      "type": "string",
+      "title": "Date of Birth",
+      "format": "date"
+    },
+    "ssn": {
+      "type": "string",
+      "title": "Social Security Number",
+      "pattern": "^[0-9]{9}$",
+      "description": "9 digits, no dashes"
+    },
+    "employmentStatus": {
+      "type": "string",
+      "title": "Employment Status",
+      "enum": ["employed", "self-employed", "retired", "unemployed", "student"]
+    },
+    "employer": {
+      "type": "string",
+      "title": "Employer Name",
+      "maxLength": 100
+    },
+    "jobTitle": {
+      "type": "string",
+      "title": "Job Title",
+      "maxLength": 100
+    },
+    "annualIncome": {
+      "type": "number",
+      "title": "Annual Income (USD)",
+      "minimum": 0,
+      "maximum": 10000000
+    },
+    "loanAmount": {
+      "type": "number",
+      "title": "Requested Loan Amount (USD)",
+      "minimum": 1000,
+      "maximum": 500000
+    },
+    "loanPurpose": {
+      "type": "string",
+      "title": "Loan Purpose",
+      "enum": [
+        "debt-consolidation",
+        "home-improvement",
+        "auto-purchase",
+        "medical",
+        "education",
+        "business",
+        "other"
+      ]
+    },
+    "loanTerm": {
+      "type": "integer",
+      "title": "Loan Term (months)",
+      "enum": [12, 24, 36, 48, 60, 72, 84]
+    },
+    "addressLine1": {
+      "type": "string",
+      "title": "Address Line 1",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "addressLine2": {
+      "type": "string",
+      "title": "Address Line 2 (Apt, Suite, etc.)",
+      "maxLength": 200
+    },
+    "city": {
+      "type": "string",
+      "title": "City",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "state": {
+      "type": "string",
+      "title": "State",
+      "minLength": 2,
+      "maxLength": 2,
+      "pattern": "^[A-Z]{2}$"
+    },
+    "zipCode": {
+      "type": "string",
+      "title": "ZIP Code",
+      "pattern": "^[0-9]{5}$"
+    },
+    "creditScore": {
+      "type": "integer",
+      "title": "Estimated Credit Score",
+      "minimum": 300,
+      "maximum": 850,
+      "enum": [
+        300, 400, 500, 550, 600, 650, 700, 750, 800, 850
+      ],
+      "description": "Select closest estimate"
+    },
+    "hasCoApplicant": {
+      "type": "boolean",
+      "title": "Do you have a co-applicant?",
+      "default": false
+    },
+    "coApplicant": {
+      "type": "object",
+      "title": "Co-Applicant Information",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "title": "First Name",
+          "minLength": 1
+        },
+        "lastName": {
+          "type": "string",
+          "title": "Last Name",
+          "minLength": 1
+        },
+        "email": {
+          "type": "string",
+          "title": "Email",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "title": "Phone",
+          "pattern": "^[0-9]{10}$"
+        },
+        "ssn": {
+          "type": "string",
+          "title": "SSN",
+          "pattern": "^[0-9]{9}$"
+        },
+        "annualIncome": {
+          "type": "number",
+          "title": "Annual Income",
+          "minimum": 0
+        }
+      }
+    },
+    "agreedToTerms": {
+      "type": "boolean",
+      "title": "I agree to the terms and conditions",
+      "const": true
+    },
+    "consentToCredit Check": {
+      "type": "boolean",
+      "title": "I consent to a credit check",
+      "const": true
+    }
+  },
+  "additionalProperties": false
+}

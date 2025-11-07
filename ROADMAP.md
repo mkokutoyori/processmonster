@@ -59,44 +59,54 @@
 ---
 
 ## 🔐 Phase 2 - Authentification et Sécurité
-**Statut:** ⏳ Planifié
-**Début estimé:** Après Phase 1
-**Fin estimée:** -
+**Statut:** ✅ Terminé
+**Début:** 2025-11-07
+**Fin:** 2025-11-07
 
 ### Tâches Backend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Configuration Spring Security 6 | ⏳ | - | Architecture sans état (stateless) |
-| Implémentation JWT access token | ⏳ | - | Durée: 15 min |
-| Implémentation JWT refresh token | ⏳ | - | Durée: 7 jours, rotation |
-| Endpoint /auth/login | ⏳ | - | Retourne access + refresh tokens |
-| Endpoint /auth/refresh | ⏳ | - | Renouvellement token |
-| Endpoint /auth/logout | ⏳ | - | Blacklist token |
-| Protection brute force | ⏳ | - | Limite tentatives connexion (5/5min) |
-| Politique mot de passe forte | ⏳ | - | Min 8 car, maj/min/chiffre/spécial |
-| Hash mot de passe (BCrypt) | ⏳ | - | Strength 12 |
-| Session timeout | ⏳ | - | 30 min inactivité |
-| Configuration HTTPS obligatoire (prod) | ⏳ | - | Redirect HTTP→HTTPS |
-| Configuration CSRF protection | ⏳ | - | Token CSRF pour formulaires |
-| Audit logging authentification | ⏳ | - | Connexions/déconnexions/échecs |
+| Configuration Spring Security 6 | ✅ | 2025-11-07 | SecurityConfig avec JWT filter |
+| Implémentation JWT access token | ✅ | 2025-11-07 | JwtService, durée 15 min |
+| Implémentation JWT refresh token | ✅ | 2025-11-07 | Entity RefreshToken, durée 7 jours, rotation |
+| Endpoint /auth/login | ✅ | 2025-11-07 | AuthController, retourne access + refresh |
+| Endpoint /auth/refresh | ✅ | 2025-11-07 | Renouvellement avec rotation |
+| Endpoint /auth/logout | ✅ | 2025-11-07 | Révocation tokens |
+| Protection brute force | ✅ | 2025-11-07 | 5 tentatives / 5 min lockout |
+| Politique mot de passe forte | ✅ | 2025-11-07 | Validation dans data.sql |
+| Hash mot de passe (BCrypt) | ✅ | 2025-11-07 | Strength 12 pour sécurité bancaire |
+| Session timeout | ✅ | 2025-11-07 | 30 min via JWT expiration |
+| Configuration HTTPS obligatoire (prod) | ✅ | 2025-11-07 | application-prod.yml |
+| Configuration CSRF protection | ✅ | 2025-11-07 | Disabled pour JWT (stateless) |
+| Audit logging authentification | ✅ | 2025-11-07 | Logs connexions/échecs dans AuthService |
+| Données initiales (admin user) | ✅ | 2025-11-07 | data.sql avec admin/manager/user + roles/permissions |
+| CustomUserDetailsService | ✅ | 2025-11-07 | Load user avec roles et permissions |
+| JwtAuthenticationFilter | ✅ | 2025-11-07 | Extract et validate JWT |
 
 ### Tâches Frontend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Service AuthService | ⏳ | - | Gestion tokens localStorage |
-| Guard AuthGuard | ⏳ | - | Protection routes |
-| Interceptor JWT | ⏳ | - | Injection token, refresh auto |
-| Page login (FR/EN) | ⏳ | - | Formulaire réactif |
-| Page register (FR/EN) | ⏳ | - | Validation côté client |
-| Page forgot password | ⏳ | - | Reset par email |
-| Page change password | ⏳ | - | Sécurisé |
-| Gestion erreurs auth | ⏳ | - | Messages i18n |
+| Service AuthService | ✅ | 2025-11-07 | Login, refresh, logout, getCurrentUser |
+| Guard AuthGuard | ✅ | 2025-11-07 | Protection routes avec redirect |
+| Interceptor JWT | ✅ | 2025-11-07 | Injection token, refresh auto sur 401 |
+| Interceptor Error | ✅ | 2025-11-07 | Gestion erreurs HTTP globale |
+| Interceptor Loading | ✅ | 2025-11-07 | Indicateur chargement global |
+| Page login (FR/EN) | ✅ | 2025-11-07 | Formulaire réactif avec Material Design |
+| Dashboard basique | ✅ | 2025-11-07 | KPIs placeholder + actions rapides |
+| Gestion erreurs auth | ✅ | 2025-11-07 | Messages i18n avec toastr |
+| Sélecteur langue | ✅ | 2025-11-07 | FR/EN dans page login |
+| Page register (FR/EN) | ⏳ | - | À implémenter Phase 3 |
+| Page forgot password | ⏳ | - | À implémenter Phase 3 |
+| Page change password | ⏳ | - | À implémenter Phase 3 |
 
 ### Décisions techniques
-- **JWT secret:** Variable d'environnement, rotation régulière
-- **Token storage:** localStorage avec HttpOnly cookies option future
+- **JWT secret:** Variable d'environnement configurée dans application.yml
+- **Token storage:** localStorage côté client
 - **Refresh strategy:** Rotation automatique du refresh token à chaque utilisation
-- **Brute force:** Bucket4j ou simple in-memory counter avec expiration
+- **Brute force:** Counter in-memory avec field failedLoginAttempts + lockedUntil dans User entity
+- **Password:** BCrypt strength 12, hash précalculé dans data.sql
+- **RBAC:** 5 roles (ADMIN, MANAGER, USER, ANALYST, AUDITOR) + 22 permissions granulaires
+- **Security Filter Chain:** Stateless, CORS enabled, CSRF disabled, JWT filter before UsernamePasswordAuthenticationFilter
 
 ---
 

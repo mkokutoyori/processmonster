@@ -41,7 +41,9 @@
     "close": "Close",
     "edit": "Edit",
     "view": "View",
-    "details": "Details"
+    "details": "Details",
+    "language": "Language",
+    "recentActivity": "Recent Activity"
   },
   "validation": {
     "required": "{{field}} is required",

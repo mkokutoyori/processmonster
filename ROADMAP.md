@@ -225,45 +225,57 @@
 ---
 
 ## ⚙️ Phase 5 - Exécution de Processus
-**Statut:** 🚧 En cours
+**Statut:** ✅ Terminé (Backend + Services)
 **Début:** 2025-11-07
-**Fin estimée:** -
+**Fin:** 2025-11-07
 
 ### Tâches Backend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Intégration Camunda/Flowable | ⏳ | - | Moteur d'orchestration |
-| Entity ProcessInstance | ⏳ | - | Instance en cours |
-| Entity ProcessVariable | ⏳ | - | Variables processus |
-| Entity ExecutionHistory | ⏳ | - | Historique exécution |
-| Service ProcessExecutionService | ⏳ | - | Démarrage, arrêt, suspension |
-| Service VariableService | ⏳ | - | Gestion variables |
-| Controller ProcessInstanceController | ⏳ | - | REST API |
-| Endpoint POST /api/instances/start | ⏳ | - | Démarrer processus |
-| Endpoint PUT /api/instances/{id}/suspend | ⏳ | - | Suspendre |
-| Endpoint PUT /api/instances/{id}/resume | ⏳ | - | Reprendre |
-| Endpoint DELETE /api/instances/{id} | ⏳ | - | Terminer/annuler |
-| Endpoint GET /api/instances/{id}/history | ⏳ | - | Historique complet |
-| Endpoint PUT /api/instances/{id}/variables | ⏳ | - | Modifier variables |
-| Gestion états (RUNNING, SUSPENDED, COMPLETED, FAILED) | ⏳ | - | State machine |
-| Tests exécution | ⏳ | - | Scénarios complets |
+| Entity ProcessInstance | ✅ | 2025-11-07 | États, business key, parent/child, audit, soft delete |
+| Entity ProcessVariable | ✅ | 2025-11-07 | 7 types, 3 scopes (GLOBAL/LOCAL/TRANSIENT) |
+| Entity ExecutionHistory | ✅ | 2025-11-07 | Audit immutable, 20+ event types |
+| Repository ProcessInstanceRepository | ✅ | 2025-11-07 | 18 query methods (status, definition, business key) |
+| Repository ProcessVariableRepository | ✅ | 2025-11-07 | Variable CRUD, find by scope/type |
+| Repository ExecutionHistoryRepository | ✅ | 2025-11-07 | Query by event type, activity, analytics |
+| Service ProcessExecutionService | ✅ | 2025-11-07 | start, suspend, resume, terminate, complete, fail |
+| Service VariableService | ✅ | 2025-11-07 | Get/set/delete, type detection, bulk operations |
+| DTOs (3) | ✅ | 2025-11-07 | ProcessInstanceDTO, StartProcessInstanceDTO, ExecutionHistoryDTO |
+| Mapper ProcessInstanceMapper | ✅ | 2025-11-07 | MapStruct entity-DTO mapping |
+| Controller ProcessInstanceController | ✅ | 2025-11-07 | 11 REST endpoints avec OpenAPI |
+| Endpoint POST /api/v1/instances/start | ✅ | 2025-11-07 | Démarrer avec variables |
+| Endpoint PUT /api/v1/instances/{id}/suspend | ✅ | 2025-11-07 | Suspendre avec raison |
+| Endpoint PUT /api/v1/instances/{id}/resume | ✅ | 2025-11-07 | Reprendre |
+| Endpoint PUT /api/v1/instances/{id}/terminate | ✅ | 2025-11-07 | Terminer avec raison |
+| Endpoint GET /api/v1/instances | ✅ | 2025-11-07 | Liste paginée |
+| Endpoint GET /api/v1/instances/active | ✅ | 2025-11-07 | Instances actives |
+| Endpoint GET /api/v1/instances/{id}/history | ✅ | 2025-11-07 | Historique complet |
+| Endpoint GET/PUT /api/v1/instances/{id}/variables | ✅ | 2025-11-07 | Get/set variables |
+| Gestion états (5 états) | ✅ | 2025-11-07 | RUNNING, SUSPENDED, COMPLETED, FAILED, TERMINATED |
+| Messages i18n FR/EN | ✅ | 2025-11-07 | 16 messages instance.* |
+| Intégration Camunda/Flowable | ⏳ | - | À intégrer Phase suivante (optionnel) |
+| Tests exécution | ⏳ | - | À implémenter |
 
 ### Tâches Frontend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Service ProcessInstanceService | ⏳ | - | API calls |
-| Page liste instances | ⏳ | - | Filtres par état |
-| Page détail instance | ⏳ | - | Progression visuelle |
-| Composant visualisation BPMN | ⏳ | - | Highlight étapes actives |
-| Modal variables processus | ⏳ | - | Édition variables |
-| Page historique exécution | ⏳ | - | Timeline |
-| Actions suspend/resume/cancel | ⏳ | - | Confirmations |
+| Models TypeScript | ✅ | 2025-11-07 | ProcessInstance, ExecutionHistory, StartRequest |
+| Service ProcessInstanceService | ✅ | 2025-11-07 | 11 méthodes API complètes |
+| Page liste instances | ⏳ | - | À implémenter |
+| Page détail instance | ⏳ | - | À implémenter |
+| Composant visualisation BPMN | ⏳ | - | À implémenter |
+| Modal variables processus | ⏳ | - | À implémenter |
+| Page historique exécution | ⏳ | - | À implémenter |
+| Actions suspend/resume/cancel | ⏳ | - | À implémenter |
 
 ### Décisions techniques
-- **Moteur:** Camunda Platform 7 (embedded) ou Flowable
-- **Persistance:** BDD partagée avec application
-- **Async:** Jobs asynchrones pour tâches longues
-- **Compensation:** Support rollback/compensation BPMN
+- **Architecture:** Sans moteur externe (Camunda optionnel pour Phase future)
+- **State Machine:** 5 états avec validations métier
+- **Variables:** Type-safe avec auto-détection de type
+- **History:** Audit trail immutable avec événements détaillés
+- **Persistance:** BDD relationnelle avec indexes optimisés
+- **Soft Delete:** Pattern appliqué pour auditabilité
+- **Security:** RBAC avec INSTANCE_* permissions
 
 ---
 

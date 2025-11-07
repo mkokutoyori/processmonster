@@ -167,3 +167,50 @@ export interface PagedResponse<T> {
   numberOfElements: number;
   empty: boolean;
 }
+
+/**
+ * Process Instance
+ */
+export interface ProcessInstance {
+  id: number;
+  processDefinitionId: number;
+  processDefinitionName: string;
+  processKey: string;
+  processVersion: number;
+  businessKey?: string;
+  status: 'RUNNING' | 'SUSPENDED' | 'COMPLETED' | 'FAILED' | 'TERMINATED';
+  startTime: string;
+  endTime?: string;
+  durationMillis?: number;
+  startedBy: string;
+  currentActivityId?: string;
+  currentActivityName?: string;
+  errorMessage?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+/**
+ * Start Process Instance Request
+ */
+export interface StartProcessInstanceRequest {
+  processDefinitionId: number;
+  businessKey?: string;
+  variables?: { [key: string]: any };
+}
+
+/**
+ * Execution History
+ */
+export interface ExecutionHistory {
+  id: number;
+  eventType: string;
+  activityId?: string;
+  activityName?: string;
+  activityType?: string;
+  timestamp: string;
+  durationMillis?: number;
+  performedBy?: string;
+  eventDetails?: string;
+  errorMessage?: string;
+}

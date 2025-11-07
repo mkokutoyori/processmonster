@@ -280,44 +280,62 @@
 ---
 
 ## ✅ Phase 6 - Gestion des Tâches
-**Statut:** ⏳ Planifié
-**Début estimé:** Après Phase 5
-**Fin estimée:** -
+**Statut:** ✅ Terminé
+**Début:** 2025-11-07
+**Fin:** 2025-11-07
 
 ### Tâches Backend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Entity Task | ⏳ | - | id, name, assignee, processInstance, dueDate, priority |
-| Entity TaskComment | ⏳ | - | Commentaires tâches |
-| Entity TaskAttachment | ⏳ | - | Pièces jointes |
-| Service TaskService | ⏳ | - | Claim, assign, complete |
-| Service NotificationService | ⏳ | - | Email + in-app |
-| Service FileStorageService | ⏳ | - | Upload/download fichiers |
-| Controller TaskController | ⏳ | - | REST API |
-| Endpoint GET /api/tasks/inbox | ⏳ | - | Inbox personnel paginé |
-| Endpoint GET /api/tasks/queue | ⏳ | - | Files d'attente par groupe |
-| Endpoint PUT /api/tasks/{id}/claim | ⏳ | - | Prendre en charge |
-| Endpoint PUT /api/tasks/{id}/assign | ⏳ | - | Réassigner |
-| Endpoint PUT /api/tasks/{id}/complete | ⏳ | - | Compléter avec formulaire |
-| Endpoint POST /api/tasks/{id}/comments | ⏳ | - | Ajouter commentaire |
-| Endpoint POST /api/tasks/{id}/attachments | ⏳ | - | Upload fichier |
-| Gestion priorités (LOW, NORMAL, HIGH, CRITICAL) | ⏳ | - | Tri par priorité |
-| Gestion deadlines avec alertes | ⏳ | - | Notifications avant échéance |
-| Tests complets tâches | ⏳ | - | Workflows complets |
+| Entity Task | ✅ | 2025-11-07 | 5 statuses, 4 priorities, soft delete, audit, indexes |
+| Entity TaskComment | ✅ | 2025-11-07 | 5 comment types, soft delete, audit |
+| Entity TaskAttachment | ✅ | 2025-11-07 | File metadata, formatted size helper |
+| Repository TaskRepository | ✅ | 2025-11-07 | 18+ query methods for task management |
+| Repository TaskCommentRepository | ✅ | 2025-11-07 | CRUD operations for comments |
+| Repository TaskAttachmentRepository | ✅ | 2025-11-07 | CRUD operations for attachments |
+| Service TaskService | ✅ | 2025-11-07 | 25+ methods - full lifecycle management |
+| Service NotificationService | ✅ | 2025-11-07 | Async notifications with Spring Events |
+| Service FileStorageService | ✅ | 2025-11-07 | File upload with MIME validation, size limits |
+| DTOs (6 total) | ✅ | 2025-11-07 | Task, CreateTask, UpdateTask, Comment, Attachment DTOs |
+| Mapper TaskMapper | ✅ | 2025-11-07 | MapStruct entity-DTO mapping |
+| Controller TaskController | ✅ | 2025-11-07 | 25 REST endpoints with OpenAPI docs |
+| Endpoint GET /api/v1/tasks/inbox | ✅ | 2025-11-07 | Personal inbox paginated |
+| Endpoint GET /api/v1/tasks/queue/{group} | ✅ | 2025-11-07 | Queue tasks by candidate group |
+| Endpoint PUT /api/v1/tasks/{id}/claim | ✅ | 2025-11-07 | Claim task for current user |
+| Endpoint PUT /api/v1/tasks/{id}/assign | ✅ | 2025-11-07 | Assign task to user |
+| Endpoint PUT /api/v1/tasks/{id}/start | ✅ | 2025-11-07 | Start task (ASSIGNED → IN_PROGRESS) |
+| Endpoint PUT /api/v1/tasks/{id}/complete | ✅ | 2025-11-07 | Complete task with optional form data |
+| Endpoint PUT /api/v1/tasks/{id}/cancel | ✅ | 2025-11-07 | Cancel task with reason |
+| Endpoint POST /api/v1/tasks/{id}/comments | ✅ | 2025-11-07 | Add comment to task |
+| Endpoint GET /api/v1/tasks/{id}/comments | ✅ | 2025-11-07 | Get all comments |
+| Endpoint POST /api/v1/tasks/{id}/attachments | ✅ | 2025-11-07 | Upload file attachment |
+| Endpoint GET /api/v1/tasks/{id}/attachments | ✅ | 2025-11-07 | Get all attachments |
+| Endpoint DELETE /api/v1/tasks/attachments/{id} | ✅ | 2025-11-07 | Delete attachment |
+| Endpoint GET /api/v1/tasks/overdue | ✅ | 2025-11-07 | Get overdue tasks |
+| Endpoint GET /api/v1/tasks/due-soon | ✅ | 2025-11-07 | Get tasks due in 24h |
+| Endpoint GET /api/v1/tasks/search | ✅ | 2025-11-07 | Search tasks by keyword |
+| Gestion priorités (LOW, NORMAL, HIGH, CRITICAL) | ✅ | 2025-11-07 | Enum with sorting support |
+| Gestion deadlines avec alertes | ✅ | 2025-11-07 | isOverdue() method + notifications |
+| Tests unitaires TaskService | ✅ | 2025-11-07 | 14 tests with Mockito (lifecycle, validation) |
+| Tests intégration TaskController | ✅ | 2025-11-07 | 18 tests with MockMvc (endpoints, security) |
 
 ### Tâches Frontend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Service TaskService | ⏳ | - | API calls |
-| Page inbox personnel | ⏳ | - | Liste tâches assignées |
-| Page files d'attente | ⏳ | - | Tâches non assignées |
-| Page détail tâche | ⏳ | - | Formulaire + commentaires + fichiers |
-| Composant formulaire dynamique | ⏳ | - | Rendu basé sur config |
-| Composant upload fichiers | ⏳ | - | Drag & drop |
-| Composant commentaires | ⏳ | - | Thread de discussion |
-| Badge notifications | ⏳ | - | Compteur tâches en attente |
-| Filtres et tri | ⏳ | - | Par priorité, date, statut |
-| Actions rapides | ⏳ | - | Claim, assign, complete |
+| Models TypeScript | ✅ | 2025-11-07 | Task, Comment, Attachment interfaces |
+| Service TaskService | ✅ | 2025-11-07 | 17+ API methods (CRUD, lifecycle, queries) |
+| Component TaskInboxComponent | ✅ | 2025-11-07 | Material table, filters, pagination, actions |
+| Component TaskDetailComponent | ✅ | 2025-11-07 | Tabs (overview, comments, attachments) |
+| Routes configuration | ✅ | 2025-11-07 | Lazy loading /tasks routes |
+| Composant upload fichiers | ✅ | 2025-11-07 | File input with upload in detail view |
+| Composant commentaires | ✅ | 2025-11-07 | Comment form + list in detail view |
+| Badge notifications | ✅ | 2025-11-07 | Active task count badge |
+| Filtres et tri | ✅ | 2025-11-07 | Status, priority filters + sort |
+| Actions rapides | ✅ | 2025-11-07 | Claim, start, complete, cancel buttons |
+| Overdue indicators | ✅ | 2025-11-07 | Red highlighting for overdue tasks |
+| Priority chips | ✅ | 2025-11-07 | Color-coded priority display |
+| Status chips | ✅ | 2025-11-07 | Color-coded status display |
+| Composant formulaire dynamique | ⏳ | - | À implémenter Phase 7 (Forms) |
 
 ### Décisions techniques
 - **Notifications:** Spring Events + async processing

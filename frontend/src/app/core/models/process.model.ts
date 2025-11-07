@@ -2,6 +2,10 @@
  * Process-related models and interfaces
  */
 
+// =============================================================================
+// Process Categories
+// =============================================================================
+
 /**
  * Process Category
  */
@@ -213,4 +217,108 @@ export interface ExecutionHistory {
   performedBy?: string;
   eventDetails?: string;
   errorMessage?: string;
+}
+
+// =============================================================================
+// Tasks
+// =============================================================================
+
+export type TaskStatus = 'CREATED' | 'ASSIGNED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+export type TaskPriority = 'LOW' | 'NORMAL' | 'HIGH' | 'CRITICAL';
+export type CommentType = 'GENERAL' | 'QUESTION' | 'DECISION' | 'ESCALATION' | 'RESOLUTION';
+
+/**
+ * Task
+ */
+export interface Task {
+  id: number;
+  name: string;
+  description?: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignee?: string;
+  candidateGroup?: string;
+  dueDate?: string;
+  followUpDate?: string;
+  processInstanceId?: number;
+  processInstanceBusinessKey?: string;
+  processDefinitionName?: string;
+  activityId?: string;
+  formKey?: string;
+  completedDate?: string;
+  completedBy?: string;
+  claimedDate?: string;
+  claimedBy?: string;
+  commentCount: number;
+  attachmentCount: number;
+  isOverdue: boolean;
+  isActive: boolean;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+/**
+ * Create Task Request
+ */
+export interface CreateTaskRequest {
+  name: string;
+  description?: string;
+  priority?: TaskPriority;
+  assignee?: string;
+  candidateGroup?: string;
+  dueDate?: string;
+  followUpDate?: string;
+  processInstanceId?: number;
+  activityId?: string;
+  formKey?: string;
+}
+
+/**
+ * Update Task Request
+ */
+export interface UpdateTaskRequest {
+  name?: string;
+  description?: string;
+  priority?: TaskPriority;
+  dueDate?: string;
+  followUpDate?: string;
+}
+
+/**
+ * Task Comment
+ */
+export interface TaskComment {
+  id: number;
+  taskId: number;
+  content: string;
+  type?: CommentType;
+  createdAt: string;
+  createdBy: string;
+}
+
+/**
+ * Create Comment Request
+ */
+export interface CreateCommentRequest {
+  content: string;
+  type?: CommentType;
+}
+
+/**
+ * Task Attachment
+ */
+export interface TaskAttachment {
+  id: number;
+  taskId: number;
+  fileName: string;
+  storedFileName: string;
+  filePath: string;
+  mimeType: string;
+  fileSize: number;
+  formattedSize: string;
+  description?: string;
+  createdAt: string;
+  createdBy: string;
 }

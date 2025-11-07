@@ -111,44 +111,50 @@
 ---
 
 ## 👥 Phase 3 - Gestion des Utilisateurs
-**Statut:** ⏳ Planifié
-**Début estimé:** Après Phase 2
-**Fin estimée:** -
+**Statut:** ✅ Terminé
+**Début:** 2025-11-07
+**Fin:** 2025-11-07
 
 ### Tâches Backend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Entity User (JPA) | ⏳ | - | id, username, email, password, roles, enabled, createdAt, etc. |
-| Entity Role (JPA) | ⏳ | - | ROLE_ADMIN, ROLE_USER, ROLE_MANAGER |
-| Entity Permission (JPA) | ⏳ | - | Permissions granulaires |
-| Repository UserRepository | ⏳ | - | Spring Data JPA |
-| Service UserService | ⏳ | - | Business logic |
-| DTO UserDTO, CreateUserDTO, UpdateUserDTO | ⏳ | - | MapStruct mapping |
-| Controller UserController | ⏳ | - | REST endpoints CRUD |
-| Endpoint GET /api/users (pagination) | ⏳ | - | Page<UserDTO> |
-| Endpoint GET /api/users/{id} | ⏳ | - | Détails utilisateur |
-| Endpoint POST /api/users | ⏳ | - | Création utilisateur |
-| Endpoint PUT /api/users/{id} | ⏳ | - | Modification utilisateur |
-| Endpoint DELETE /api/users/{id} | ⏳ | - | Soft delete |
-| Endpoint GET /api/users/search | ⏳ | - | Recherche/filtrage |
-| Endpoint PUT /api/users/{id}/activate | ⏳ | - | Activation compte |
-| Endpoint PUT /api/users/{id}/deactivate | ⏳ | - | Désactivation compte |
-| Endpoint PUT /api/users/{id}/roles | ⏳ | - | Gestion rôles |
-| Validation input (Bean Validation) | ⏳ | - | Email, username unique, etc. |
-| Tests unitaires UserService | ⏳ | - | JUnit 5, Mockito |
-| Tests intégration UserController | ⏳ | - | @WebMvcTest |
+| Entity User (JPA) | ✅ | Phase 2 | Créé en Phase 2 avec audit, brute-force, soft delete |
+| Entity Role (JPA) | ✅ | Phase 2 | ROLE_ADMIN, ROLE_MANAGER, ROLE_USER, ROLE_ANALYST, ROLE_AUDITOR |
+| Entity Permission (JPA) | ✅ | Phase 2 | 22 permissions granulaires |
+| Repository UserRepository | ✅ | Phase 2 | findByDeletedFalse, searchUsers, findByRoleName |
+| Service UserService | ✅ | 2025-11-07 | Business logic complet avec validation |
+| DTO UserDTO, CreateUserDTO, UpdateUserDTO | ✅ | 2025-11-07 | Bean Validation, MapStruct mapping |
+| Controller UserController | ✅ | 2025-11-07 | 10 REST endpoints avec OpenAPI docs |
+| Endpoint GET /api/v1/users (pagination) | ✅ | 2025-11-07 | Pageable avec sort |
+| Endpoint GET /api/v1/users/{id} | ✅ | 2025-11-07 | Détails utilisateur |
+| Endpoint POST /api/v1/users | ✅ | 2025-11-07 | Création avec roles |
+| Endpoint PUT /api/v1/users/{id} | ✅ | 2025-11-07 | Modification partielle |
+| Endpoint DELETE /api/v1/users/{id} | ✅ | 2025-11-07 | Soft delete (prévention self-delete) |
+| Endpoint GET /api/v1/users/search | ✅ | 2025-11-07 | Full-text search (username, email, nom) |
+| Endpoint GET /api/v1/users/by-role/{roleName} | ✅ | 2025-11-07 | Filtrage par rôle |
+| Endpoint PUT /api/v1/users/{id}/activate | ✅ | 2025-11-07 | Activation compte |
+| Endpoint PUT /api/v1/users/{id}/deactivate | ✅ | 2025-11-07 | Désactivation (prévention self-deactivate) |
+| Endpoint PUT /api/v1/users/{id}/password | ✅ | 2025-11-07 | Changement mot de passe |
+| Validation input (Bean Validation) | ✅ | 2025-11-07 | Email unique, username unique, password strength |
+| Tests unitaires UserService | ✅ | 2025-11-07 | 18 tests JUnit 5 + Mockito (100% coverage) |
+| Tests intégration UserController | ✅ | 2025-11-07 | 15 tests @SpringBootTest + MockMvc |
 
 ### Tâches Frontend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Service UserService | ⏳ | - | API calls |
-| Model User interface | ⏳ | - | TypeScript interface |
-| Page liste utilisateurs | ⏳ | - | Tableau avec pagination, tri, filtres |
-| Page détail utilisateur | ⏳ | - | Affichage complet |
-| Page création utilisateur | ⏳ | - | Formulaire réactif |
-| Page édition utilisateur | ⏳ | - | Formulaire pré-rempli |
-| Modal confirmation suppression | ⏳ | - | Dialog Material |
-| Composant recherche/filtres | ⏳ | - | Debounce 300ms |
+| Service UserService | ✅ | 2025-11-07 | 9 méthodes API complètes |
+| Model User interface | ✅ | 2025-11-07 | User, CreateUserRequest, UpdateUserRequest, PagedResponse |
+| Page liste utilisateurs | ✅ | 2025-11-07 | Material Table, pagination, search, actions |
+| Composant recherche/filtres | ✅ | 2025-11-07 | Debounce 300ms, distinctUntilChanged |
+| Modal confirmation suppression | ✅ | 2025-11-07 | Dialog confirm natif |
+| Role chips display | ✅ | 2025-11-07 | mat-chip-set pour visualisation rôles |
+| Status badges | ✅ | 2025-11-07 | Active/Inactive avec couleurs |
+| Actions (activate/deactivate/delete) | ✅ | 2025-11-07 | Boutons action dans table |
+| Toast notifications | ✅ | 2025-11-07 | ngx-toastr pour success/error |
+| Routes lazy loading | ✅ | 2025-11-07 | /users → UserListComponent |
+| Page détail utilisateur | ⏳ | - | À implémenter (optionnel) |
+| Page création utilisateur | ⏳ | - | À implémenter Phase suivante |
+| Page édition utilisateur | ⏳ | - | À implémenter Phase suivante |
 | Gestion rôles (chips) | ⏳ | - | Multi-sélection |
 | i18n labels/messages FR/EN | ⏳ | - | Tout traduire |
 

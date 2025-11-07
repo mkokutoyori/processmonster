@@ -1,0 +1,172 @@
+# ProcessMonster Banking BPM - Main Configuration
+# This file contains common configuration shared across all profiles
+
+spring:
+  application:
+    name: processmonster-banking-bpm
+
+  # Default profile
+  profiles:
+    active: ${SPRING_PROFILE:dev}
+
+  # Jackson JSON Configuration
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: true
+    deserialization:
+      fail-on-unknown-properties: false
+    default-property-inclusion: non_null
+    time-zone: UTC
+
+  # Internationalization
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8
+    fallback-to-system-locale: false
+    cache-duration: 3600
+
+  # Web Configuration
+  mvc:
+    throw-exception-if-no-handler-found: true
+    locale-resolver: accept_header
+
+  web:
+    resources:
+      add-mappings: true
+
+  # JPA Common Configuration
+  jpa:
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: false
+        jdbc:
+          batch_size: 20
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+        query:
+          in_clause_parameter_padding: true
+
+  # File Upload Configuration
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  # Email Configuration (to be configured per environment)
+  mail:
+    protocol: smtp
+    default-encoding: UTF-8
+
+  # Actuator Configuration
+  management:
+    endpoints:
+      web:
+        exposure:
+          include: health,info,metrics,prometheus
+    endpoint:
+      health:
+        show-details: when-authorized
+
+# Application Custom Configuration
+app:
+  name: ProcessMonster Banking BPM
+  version: 1.0.0
+
+  # i18n Configuration
+  i18n:
+    default-locale: en
+    supported-locales: en,fr
+
+  # JWT Configuration
+  jwt:
+    secret: ${JWT_SECRET:changeme-in-production-use-strong-secret-key-minimum-512-bits}
+    access-token-expiration: 900000 # 15 minutes in milliseconds
+    refresh-token-expiration: 604800000 # 7 days in milliseconds
+
+  # CORS Configuration
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
+    allowed-methods: GET,POST,PUT,DELETE,PATCH,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+
+  # Security Configuration
+  security:
+    password:
+      min-length: 8
+      require-uppercase: true
+      require-lowercase: true
+      require-digit: true
+      require-special: true
+    brute-force:
+      max-attempts: 5
+      lockout-duration: 300000 # 5 minutes
+    session-timeout: 1800000 # 30 minutes
+
+  # Rate Limiting Configuration
+  rate-limit:
+    enabled: true
+    requests-per-minute: 100
+
+  # File Storage Configuration
+  storage:
+    location: ${STORAGE_LOCATION:./uploads}
+    max-size: 10485760 # 10MB
+
+  # Audit Configuration
+  audit:
+    enabled: true
+    retention-days: 365
+
+  # Cache Configuration
+  cache:
+    caffeine:
+      spec: maximumSize=1000,expireAfterWrite=300s
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.processmonster.bpm: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type.descriptor.sql.BasicBinder: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# OpenAPI/Swagger Configuration
+springdoc:
+  api-docs:
+    path: /api/v1/api-docs
+  swagger-ui:
+    path: /api/v1/swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+    display-request-duration: true
+  show-actuator: false
+
+# Camunda Configuration
+camunda:
+  bpm:
+    admin-user:
+      id: admin
+      password: ${CAMUNDA_ADMIN_PASSWORD:admin}
+      firstName: Admin
+    filter:
+      create: All tasks
+    authorization:
+      enabled: true
+    id-generator: strong
+    history-level: full
+    generic-properties:
+      properties:
+        enableExpressionsInAdhocQueries: false

@@ -1,0 +1,118 @@
+# ProcessMonster Banking BPM - Production Profile Configuration
+
+spring:
+  # PostgreSQL Database Configuration for Production (Heroku)
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/processmonster}
+    driverClassName: org.postgresql.Driver
+    username: ${DATABASE_USERNAME:postgres}
+    password: ${DATABASE_PASSWORD:}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+
+  # JPA Configuration for Production
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+
+  # Email Configuration for Production
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          ssl:
+            trust: ${MAIL_HOST:smtp.gmail.com}
+
+  # DevTools - Disabled in production
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+
+# Logging Configuration for Production
+logging:
+  level:
+    root: WARN
+    com.processmonster.bpm: INFO
+    org.springframework.web: WARN
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+  file:
+    name: ./logs/processmonster-prod.log
+    max-size: 50MB
+    max-history: 30
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Actuator - Limited exposure in production
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# OpenAPI/Swagger - Disabled in production for security
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+# Camunda - Admin UI disabled in production
+camunda:
+  bpm:
+    admin-user:
+      id: ${CAMUNDA_ADMIN_USER:admin}
+      password: ${CAMUNDA_ADMIN_PASSWORD}
+    webapp:
+      index-redirect-enabled: false
+
+# Application Custom Configuration for Production
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+  jwt:
+    secret: ${JWT_SECRET}
+  storage:
+    location: ${STORAGE_LOCATION:/tmp/uploads}
+  security:
+    session-timeout: 1800000 # 30 minutes
+
+# Force HTTPS in production
+server:
+  port: ${PORT:8080}
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+  http2:
+    enabled: true
+  forward-headers-strategy: native
+  error:
+    include-message: never
+    include-stacktrace: never

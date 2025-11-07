@@ -225,8 +225,8 @@
 ---
 
 ## ⚙️ Phase 5 - Exécution de Processus
-**Statut:** ⏳ Planifié
-**Début estimé:** Après Phase 4
+**Statut:** 🚧 En cours
+**Début:** 2025-11-07
 **Fin estimée:** -
 
 ### Tâches Backend

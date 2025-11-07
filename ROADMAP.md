@@ -167,8 +167,8 @@
 ---
 
 ## 📊 Phase 4 - Modélisation de Processus
-**Statut:** ⏳ Planifié
-**Début estimé:** Après Phase 3
+**Statut:** 🚧 En cours
+**Début:** 2025-11-07
 **Fin estimée:** -
 
 ### Tâches Backend

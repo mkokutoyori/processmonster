@@ -1,0 +1,524 @@
+# 🗺️ ROADMAP - Application BPM Bancaire
+
+**Projet:** ProcessMonster - Banking Business Process Management
+**Stack:** Spring Boot 3.x (Java 17+) + Angular 17+ + H2/PostgreSQL
+**Déploiement:** Heroku
+**i18n:** Français 🇫🇷 / English 🇬🇧
+
+**Légende des statuts:**
+- ✅ **Terminé** - Fonctionnalité complète et testée
+- 🚧 **En cours** - Développement actif
+- ⏳ **Planifié** - À venir
+- ❌ **Bloqué** - Nécessite une intervention
+- 🔄 **En révision** - Tests en cours
+
+---
+
+## 📋 Phase 1 - Infrastructure et Configuration
+**Statut:** ✅ Terminé
+**Début:** 2025-11-07
+**Fin:** 2025-11-07
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Initialisation projet Spring Boot 3.x | ✅ | 2025-11-07 | Java 17+, Maven, pom.xml avec toutes dépendances |
+| Configuration H2 (dev) + PostgreSQL (prod) | ✅ | 2025-11-07 | application-dev.yml, application-prod.yml |
+| Configuration i18n (ResourceBundle FR/EN) | ✅ | 2025-11-07 | messages_fr.properties, messages_en.properties, I18nConfig |
+| Configuration CORS | ✅ | 2025-11-07 | CorsConfig avec origins configurables |
+| Configuration Swagger/OpenAPI 3.0 | ✅ | 2025-11-07 | OpenApiConfig avec JWT security |
+| Configuration profils dev/prod | ✅ | 2025-11-07 | application.yml + profils spécifiques |
+| Configuration Lombok + MapStruct | ✅ | 2025-11-07 | Annotation processors dans pom.xml |
+| Configuration exception handler global | ✅ | 2025-11-07 | GlobalExceptionHandler avec i18n |
+| Configuration validation Bean | ✅ | 2025-11-07 | spring-boot-starter-validation |
+| Configuration logging (SLF4J/Logback) | ✅ | 2025-11-07 | Patterns configurés par profil |
+| Configuration cache Caffeine | ✅ | 2025-11-07 | CacheConfig pour performance |
+| Configuration async | ✅ | 2025-11-07 | AsyncConfig avec thread pool |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Initialisation projet Angular 17+ | ✅ | 2025-11-07 | package.json, angular.json, tsconfig, standalone components |
+| Configuration ngx-translate | ✅ | 2025-11-07 | fr.json, en.json, TranslateModule avec HttpLoader |
+| Configuration routing et lazy loading | ✅ | 2025-11-07 | app.routes.ts avec lazy loading par feature |
+| Configuration HTTP interceptor | ✅ | 2025-11-07 | auth, error, loading interceptors |
+| Configuration environnements dev/prod | ✅ | 2025-11-07 | environment.ts, environment.prod.ts |
+| Installation UI library (Angular Material) | ✅ | 2025-11-07 | @angular/material configuré |
+| Configuration Chart.js | ✅ | 2025-11-07 | ng2-charts dans package.json |
+| Configuration service worker (PWA) | ✅ | 2025-11-07 | provideServiceWorker dans app.config |
+
+### Décisions techniques
+- **Build:** Maven pour backend, npm/Angular CLI pour frontend
+- **Java:** Version 17 LTS pour stabilité et support long terme
+- **Angular:** Version 17+ avec signals et standalone components
+- **BD dev:** H2 en mode fichier pour persistance entre redémarrages
+- **BD prod:** PostgreSQL via addon Heroku
+- **i18n backend:** ResourceBundleMessageSource avec LocaleResolver basé sur header Accept-Language
+- **i18n frontend:** ngx-translate avec détection automatique de la langue navigateur
+
+---
+
+## 🔐 Phase 2 - Authentification et Sécurité
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 1
+**Fin estimée:** -
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Configuration Spring Security 6 | ⏳ | - | Architecture sans état (stateless) |
+| Implémentation JWT access token | ⏳ | - | Durée: 15 min |
+| Implémentation JWT refresh token | ⏳ | - | Durée: 7 jours, rotation |
+| Endpoint /auth/login | ⏳ | - | Retourne access + refresh tokens |
+| Endpoint /auth/refresh | ⏳ | - | Renouvellement token |
+| Endpoint /auth/logout | ⏳ | - | Blacklist token |
+| Protection brute force | ⏳ | - | Limite tentatives connexion (5/5min) |
+| Politique mot de passe forte | ⏳ | - | Min 8 car, maj/min/chiffre/spécial |
+| Hash mot de passe (BCrypt) | ⏳ | - | Strength 12 |
+| Session timeout | ⏳ | - | 30 min inactivité |
+| Configuration HTTPS obligatoire (prod) | ⏳ | - | Redirect HTTP→HTTPS |
+| Configuration CSRF protection | ⏳ | - | Token CSRF pour formulaires |
+| Audit logging authentification | ⏳ | - | Connexions/déconnexions/échecs |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Service AuthService | ⏳ | - | Gestion tokens localStorage |
+| Guard AuthGuard | ⏳ | - | Protection routes |
+| Interceptor JWT | ⏳ | - | Injection token, refresh auto |
+| Page login (FR/EN) | ⏳ | - | Formulaire réactif |
+| Page register (FR/EN) | ⏳ | - | Validation côté client |
+| Page forgot password | ⏳ | - | Reset par email |
+| Page change password | ⏳ | - | Sécurisé |
+| Gestion erreurs auth | ⏳ | - | Messages i18n |
+
+### Décisions techniques
+- **JWT secret:** Variable d'environnement, rotation régulière
+- **Token storage:** localStorage avec HttpOnly cookies option future
+- **Refresh strategy:** Rotation automatique du refresh token à chaque utilisation
+- **Brute force:** Bucket4j ou simple in-memory counter avec expiration
+
+---
+
+## 👥 Phase 3 - Gestion des Utilisateurs
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 2
+**Fin estimée:** -
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Entity User (JPA) | ⏳ | - | id, username, email, password, roles, enabled, createdAt, etc. |
+| Entity Role (JPA) | ⏳ | - | ROLE_ADMIN, ROLE_USER, ROLE_MANAGER |
+| Entity Permission (JPA) | ⏳ | - | Permissions granulaires |
+| Repository UserRepository | ⏳ | - | Spring Data JPA |
+| Service UserService | ⏳ | - | Business logic |
+| DTO UserDTO, CreateUserDTO, UpdateUserDTO | ⏳ | - | MapStruct mapping |
+| Controller UserController | ⏳ | - | REST endpoints CRUD |
+| Endpoint GET /api/users (pagination) | ⏳ | - | Page<UserDTO> |
+| Endpoint GET /api/users/{id} | ⏳ | - | Détails utilisateur |
+| Endpoint POST /api/users | ⏳ | - | Création utilisateur |
+| Endpoint PUT /api/users/{id} | ⏳ | - | Modification utilisateur |
+| Endpoint DELETE /api/users/{id} | ⏳ | - | Soft delete |
+| Endpoint GET /api/users/search | ⏳ | - | Recherche/filtrage |
+| Endpoint PUT /api/users/{id}/activate | ⏳ | - | Activation compte |
+| Endpoint PUT /api/users/{id}/deactivate | ⏳ | - | Désactivation compte |
+| Endpoint PUT /api/users/{id}/roles | ⏳ | - | Gestion rôles |
+| Validation input (Bean Validation) | ⏳ | - | Email, username unique, etc. |
+| Tests unitaires UserService | ⏳ | - | JUnit 5, Mockito |
+| Tests intégration UserController | ⏳ | - | @WebMvcTest |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Service UserService | ⏳ | - | API calls |
+| Model User interface | ⏳ | - | TypeScript interface |
+| Page liste utilisateurs | ⏳ | - | Tableau avec pagination, tri, filtres |
+| Page détail utilisateur | ⏳ | - | Affichage complet |
+| Page création utilisateur | ⏳ | - | Formulaire réactif |
+| Page édition utilisateur | ⏳ | - | Formulaire pré-rempli |
+| Modal confirmation suppression | ⏳ | - | Dialog Material |
+| Composant recherche/filtres | ⏳ | - | Debounce 300ms |
+| Gestion rôles (chips) | ⏳ | - | Multi-sélection |
+| i18n labels/messages FR/EN | ⏳ | - | Tout traduire |
+
+### Décisions techniques
+- **Pagination:** Spring Data Pageable, taille par défaut 20
+- **Soft delete:** Champ `deleted` boolean + `deletedAt` timestamp
+- **Search:** JPA Specifications pour filtrage dynamique
+- **RBAC:** Annotation @PreAuthorize sur endpoints
+
+---
+
+## 📊 Phase 4 - Modélisation de Processus
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 3
+**Fin estimée:** -
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Entity ProcessDefinition | ⏳ | - | id, name, key, version, bpmnXml, category, isTemplate |
+| Entity ProcessCategory | ⏳ | - | Catégorisation processus |
+| Repository ProcessDefinitionRepository | ⏳ | - | Version queries |
+| Service ProcessDefinitionService | ⏳ | - | CRUD, versioning |
+| Service BpmnValidationService | ⏳ | - | Validation XML BPMN |
+| Controller ProcessDefinitionController | ⏳ | - | REST API |
+| Endpoint POST /api/processes | ⏳ | - | Création processus |
+| Endpoint PUT /api/processes/{id} | ⏳ | - | Nouvelle version |
+| Endpoint GET /api/processes | ⏳ | - | Liste avec versions |
+| Endpoint GET /api/processes/{id}/xml | ⏳ | - | Export BPMN XML |
+| Endpoint POST /api/processes/import | ⏳ | - | Import BPMN XML |
+| Endpoint GET /api/processes/templates | ⏳ | - | Templates prédéfinis |
+| Versioning automatique | ⏳ | - | Incrémentation version |
+| Tests validation BPMN | ⏳ | - | XML valide/invalide |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Installation bpmn-js | ⏳ | - | Éditeur BPMN |
+| Composant BpmnEditor | ⏳ | - | Intégration bpmn-js |
+| Service ProcessService | ⏳ | - | API calls |
+| Page liste processus | ⏳ | - | Avec versions |
+| Page éditeur processus | ⏳ | - | bpmn-js + toolbar |
+| Modal import BPMN | ⏳ | - | Upload XML |
+| Modal export BPMN | ⏳ | - | Download XML |
+| Palette BPMN personnalisée | ⏳ | - | Éléments bancaires |
+| Validation visuelle | ⏳ | - | Erreurs en temps réel |
+| Gestion catégories | ⏳ | - | Filtrage par catégorie |
+
+### Décisions techniques
+- **BPMN:** Standard BPMN 2.0 XML
+- **Versioning:** Incrémentation automatique à chaque sauvegarde
+- **Éditeur:** bpmn-js (open source, extensible)
+- **Validation:** Schéma XSD BPMN 2.0
+
+---
+
+## ⚙️ Phase 5 - Exécution de Processus
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 4
+**Fin estimée:** -
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Intégration Camunda/Flowable | ⏳ | - | Moteur d'orchestration |
+| Entity ProcessInstance | ⏳ | - | Instance en cours |
+| Entity ProcessVariable | ⏳ | - | Variables processus |
+| Entity ExecutionHistory | ⏳ | - | Historique exécution |
+| Service ProcessExecutionService | ⏳ | - | Démarrage, arrêt, suspension |
+| Service VariableService | ⏳ | - | Gestion variables |
+| Controller ProcessInstanceController | ⏳ | - | REST API |
+| Endpoint POST /api/instances/start | ⏳ | - | Démarrer processus |
+| Endpoint PUT /api/instances/{id}/suspend | ⏳ | - | Suspendre |
+| Endpoint PUT /api/instances/{id}/resume | ⏳ | - | Reprendre |
+| Endpoint DELETE /api/instances/{id} | ⏳ | - | Terminer/annuler |
+| Endpoint GET /api/instances/{id}/history | ⏳ | - | Historique complet |
+| Endpoint PUT /api/instances/{id}/variables | ⏳ | - | Modifier variables |
+| Gestion états (RUNNING, SUSPENDED, COMPLETED, FAILED) | ⏳ | - | State machine |
+| Tests exécution | ⏳ | - | Scénarios complets |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Service ProcessInstanceService | ⏳ | - | API calls |
+| Page liste instances | ⏳ | - | Filtres par état |
+| Page détail instance | ⏳ | - | Progression visuelle |
+| Composant visualisation BPMN | ⏳ | - | Highlight étapes actives |
+| Modal variables processus | ⏳ | - | Édition variables |
+| Page historique exécution | ⏳ | - | Timeline |
+| Actions suspend/resume/cancel | ⏳ | - | Confirmations |
+
+### Décisions techniques
+- **Moteur:** Camunda Platform 7 (embedded) ou Flowable
+- **Persistance:** BDD partagée avec application
+- **Async:** Jobs asynchrones pour tâches longues
+- **Compensation:** Support rollback/compensation BPMN
+
+---
+
+## ✅ Phase 6 - Gestion des Tâches
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 5
+**Fin estimée:** -
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Entity Task | ⏳ | - | id, name, assignee, processInstance, dueDate, priority |
+| Entity TaskComment | ⏳ | - | Commentaires tâches |
+| Entity TaskAttachment | ⏳ | - | Pièces jointes |
+| Service TaskService | ⏳ | - | Claim, assign, complete |
+| Service NotificationService | ⏳ | - | Email + in-app |
+| Service FileStorageService | ⏳ | - | Upload/download fichiers |
+| Controller TaskController | ⏳ | - | REST API |
+| Endpoint GET /api/tasks/inbox | ⏳ | - | Inbox personnel paginé |
+| Endpoint GET /api/tasks/queue | ⏳ | - | Files d'attente par groupe |
+| Endpoint PUT /api/tasks/{id}/claim | ⏳ | - | Prendre en charge |
+| Endpoint PUT /api/tasks/{id}/assign | ⏳ | - | Réassigner |
+| Endpoint PUT /api/tasks/{id}/complete | ⏳ | - | Compléter avec formulaire |
+| Endpoint POST /api/tasks/{id}/comments | ⏳ | - | Ajouter commentaire |
+| Endpoint POST /api/tasks/{id}/attachments | ⏳ | - | Upload fichier |
+| Gestion priorités (LOW, NORMAL, HIGH, CRITICAL) | ⏳ | - | Tri par priorité |
+| Gestion deadlines avec alertes | ⏳ | - | Notifications avant échéance |
+| Tests complets tâches | ⏳ | - | Workflows complets |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Service TaskService | ⏳ | - | API calls |
+| Page inbox personnel | ⏳ | - | Liste tâches assignées |
+| Page files d'attente | ⏳ | - | Tâches non assignées |
+| Page détail tâche | ⏳ | - | Formulaire + commentaires + fichiers |
+| Composant formulaire dynamique | ⏳ | - | Rendu basé sur config |
+| Composant upload fichiers | ⏳ | - | Drag & drop |
+| Composant commentaires | ⏳ | - | Thread de discussion |
+| Badge notifications | ⏳ | - | Compteur tâches en attente |
+| Filtres et tri | ⏳ | - | Par priorité, date, statut |
+| Actions rapides | ⏳ | - | Claim, assign, complete |
+
+### Décisions techniques
+- **Notifications:** Spring Events + async processing
+- **Email:** JavaMailSender avec templates HTML i18n
+- **Upload:** Multipart, limite 10MB, validation MIME type
+- **Storage:** Local dev, AWS S3/Heroku addon prod
+- **Real-time:** WebSocket pour notifications in-app (optionnel)
+
+---
+
+## 📝 Phase 7 - Formulaires Dynamiques
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 6
+**Fin estimée:** -
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Entity FormDefinition | ⏳ | - | JSON schema formulaire |
+| Entity FormSubmission | ⏳ | - | Données soumises |
+| Service FormService | ⏳ | - | CRUD formulaires |
+| Service FormValidationService | ⏳ | - | Validation côté serveur |
+| Controller FormController | ⏳ | - | REST API |
+| Endpoint POST /api/forms | ⏳ | - | Créer formulaire |
+| Endpoint GET /api/forms/{id} | ⏳ | - | Récupérer config |
+| Endpoint POST /api/forms/{id}/validate | ⏳ | - | Valider données |
+| Endpoint POST /api/forms/{id}/submit | ⏳ | - | Soumettre |
+| Support types de champs (text, number, date, select, checkbox, file, etc.) | ⏳ | - | JSON schema |
+| Validation règles (required, min, max, pattern, custom) | ⏳ | - | JSR-380 dynamique |
+| Champs conditionnels | ⏳ | - | Show/hide basé sur valeurs |
+| Auto-save brouillons | ⏳ | - | Sauvegarde automatique |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Service FormService | ⏳ | - | API calls |
+| Composant FormBuilder | ⏳ | - | Drag & drop builder |
+| Composant FormRenderer | ⏳ | - | Rendu dynamique |
+| Composant field types (text, number, date, etc.) | ⏳ | - | Components réutilisables |
+| Validation client (Reactive Forms) | ⏳ | - | Sync avec validation serveur |
+| Gestion champs conditionnels | ⏳ | - | RxJS pour réactivité |
+| Auto-save | ⏳ | - | Debounce + localStorage |
+| Preview formulaire | ⏳ | - | Mode aperçu |
+
+### Décisions techniques
+- **Schema:** JSON Schema Draft 7 pour définition formulaires
+- **Builder:** Bibliothèque formio.js ou custom drag & drop
+- **Validation:** Même règles côté client (Angular) et serveur (Bean Validation)
+- **Auto-save:** Debounce 2s, localStorage, sync avec backend
+
+---
+
+## 📈 Phase 8 - Monitoring et Reporting
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 7
+**Fin estimée:** -
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Service MetricsService | ⏳ | - | Calcul KPIs |
+| Service ReportService | ⏳ | - | Génération rapports |
+| Service ExportService | ⏳ | - | Export PDF/Excel |
+| Controller DashboardController | ⏳ | - | REST API |
+| Endpoint GET /api/dashboard/kpis | ⏳ | - | KPIs temps réel |
+| Endpoint GET /api/dashboard/process-stats | ⏳ | - | Stats par processus |
+| Endpoint GET /api/dashboard/user-stats | ⏳ | - | Stats par utilisateur |
+| Endpoint GET /api/reports/generate | ⏳ | - | Génération rapport paramétré |
+| Endpoint GET /api/reports/{id}/download | ⏳ | - | Téléchargement |
+| KPIs (nb processus actifs, tâches en retard, temps moyen, etc.) | ⏳ | - | Requêtes optimisées |
+| Génération PDF (iText/Flying Saucer) | ⏳ | - | Templates HTML→PDF |
+| Génération Excel (Apache POI) | ⏳ | - | XLS/XLSX |
+| Cache métriques | ⏳ | - | Caffeine 5min TTL |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Service DashboardService | ⏳ | - | API calls |
+| Page dashboard principal | ⏳ | - | Vue d'ensemble |
+| Composants KPI cards | ⏳ | - | Cartes métriques |
+| Graphiques Chart.js (line, bar, pie, doughnut) | ⏳ | - | Visualisations |
+| Filtres période (jour, semaine, mois, année, custom) | ⏳ | - | Date range picker |
+| Page rapports | ⏳ | - | Configuration et génération |
+| Modal configuration rapport | ⏳ | - | Sélection paramètres |
+| Download PDF/Excel | ⏳ | - | Boutons export |
+| Refresh automatique dashboard | ⏳ | - | Polling 30s |
+
+### Décisions techniques
+- **Charts:** Chart.js avec ng2-charts wrapper
+- **PDF:** iText pour génération côté serveur
+- **Excel:** Apache POI
+- **Cache:** Caffeine pour éviter recalculs fréquents
+- **Async:** Rapports lourds en async avec notification
+
+---
+
+## 🔌 Phase 9 - API et Intégrations
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 8
+**Fin estimée:** -
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Versioning API (v1, v2) | ⏳ | - | URL /api/v1/... |
+| Documentation OpenAPI 3.0 complète | ⏳ | - | Swagger UI |
+| Rate limiting | ⏳ | - | Bucket4j, 100 req/min par IP |
+| Entity ApiKey | ⏳ | - | Clés API pour intégrations |
+| Service ApiKeyService | ⏳ | - | Génération, révocation |
+| Entity Webhook | ⏳ | - | Webhooks sortants |
+| Service WebhookService | ⏳ | - | Déclenchement événements |
+| Controller ApiKeyController | ⏳ | - | Gestion API keys |
+| Controller WebhookController | ⏳ | - | Config webhooks |
+| Authentication API key (header X-API-Key) | ⏳ | - | Alternative à JWT |
+| Événements webhook (process.started, task.completed, etc.) | ⏳ | - | Pub/Sub pattern |
+| Retry webhooks en cas d'échec | ⏳ | - | Exponential backoff |
+| Tests API avec RestAssured | ⏳ | - | Tests intégration |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Page gestion API keys | ⏳ | - | Génération, liste, révocation |
+| Page configuration webhooks | ⏳ | - | URL, événements, secrets |
+| Page documentation API | ⏳ | - | Swagger UI embedded |
+| Logs webhooks | ⏳ | - | Historique calls |
+
+### Décisions techniques
+- **Versioning:** URI versioning (/api/v1, /api/v2)
+- **Rate limiting:** Bucket4j avec Redis (prod) ou in-memory (dev)
+- **API keys:** UUID v4, hash SHA-256 en BD
+- **Webhooks:** HTTP POST JSON, signature HMAC-SHA256
+
+---
+
+## 🛡️ Phase 10 - Audit et Administration
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 9
+**Fin estimée:** -
+
+### Tâches Backend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Entity AuditLog | ⏳ | - | Immuable, toutes actions sensibles |
+| Service AuditService | ⏳ | - | Logging centralisé |
+| Aspect AOP @Audited | ⏳ | - | Audit automatique |
+| Controller AuditController | ⏳ | - | Consultation logs |
+| Endpoint GET /api/audit/logs | ⏳ | - | Recherche logs |
+| Endpoint GET /api/audit/user/{id} | ⏳ | - | Logs par utilisateur |
+| Endpoint GET /api/audit/export | ⏳ | - | Export conformité |
+| Entity SystemParameter | ⏳ | - | Configuration système |
+| Service SystemService | ⏳ | - | Gestion paramètres |
+| Controller AdminController | ⏳ | - | Panel admin |
+| Endpoint GET /actuator/health | ⏳ | - | Health checks |
+| Endpoint GET /actuator/metrics | ⏳ | - | Métriques système |
+| Endpoint GET /api/admin/system-info | ⏳ | - | Infos système |
+| Protection données sensibles logs | ⏳ | - | Masking automatique |
+| Rétention logs (1 an minimum) | ⏳ | - | Conformité bancaire |
+
+### Tâches Frontend
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Page audit logs | ⏳ | - | Recherche, filtrage, export |
+| Page administration système | ⏳ | - | Paramètres, health |
+| Page métriques système | ⏳ | - | CPU, mémoire, requêtes |
+| Dashboard admin | ⏳ | - | Vue d'ensemble système |
+| Filtres audit avancés | ⏳ | - | Date, utilisateur, action, entité |
+
+### Décisions techniques
+- **Audit:** Tous les CUD (Create/Update/Delete), auth, accès sensibles
+- **Immuabilité:** Logs jamais supprimés, table append-only
+- **Format:** JSON structuré avec contexte complet
+- **Conformité:** PCI DSS, RGPD, exigences bancaires
+- **Masking:** Regex pour détecter données sensibles (PAN, SSN, etc.)
+
+---
+
+## 🚀 Phase 11 - Déploiement et Documentation
+**Statut:** ⏳ Planifié
+**Début estimé:** Après Phase 10
+**Fin estimée:** -
+
+### Tâches
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Procfile Heroku | ⏳ | - | web: java -jar backend.jar |
+| Configuration PostgreSQL Heroku | ⏳ | - | Addon DATABASE_URL |
+| Variables d'environnement Heroku | ⏳ | - | Secrets, config |
+| Script start-dev.sh | ⏳ | - | Lancement local |
+| Script deploy.sh | ⏳ | - | Déploiement automatisé |
+| GitHub Actions CI/CD | ⏳ | - | Tests + deploy auto |
+| README.md complet | ⏳ | - | Installation, architecture |
+| API-DOCS.md | ⏳ | - | Documentation API complète |
+| USER-GUIDE.md (FR) | ⏳ | - | Guide utilisateur français |
+| USER-GUIDE.md (EN) | ⏳ | - | Guide utilisateur anglais |
+| init-db.sql | ⏳ | - | Données initiales + admin |
+| Tests E2E (Playwright/Cypress) | ⏳ | - | Scénarios complets |
+| Validation sécurité OWASP | ⏳ | - | Checklist Top 10 |
+| Performance testing (JMeter) | ⏳ | - | Load tests |
+
+### Décisions techniques
+- **Heroku stack:** heroku-22
+- **Build:** Maven pour backend, build Angular en CI/CD
+- **Serving:** Backend sert aussi frontend (dist/ en resources/static)
+- **CI/CD:** GitHub Actions avec tests obligatoires avant deploy
+
+---
+
+## 📊 Métriques Globales
+
+| Métrique | Objectif | Actuel |
+|----------|----------|---------|
+| Couverture tests backend | >70% | 0% |
+| Couverture tests frontend | >60% | 0% |
+| Taux i18n FR/EN | 100% | 0% |
+| Score sécurité OWASP | A | - |
+| Performance API (p95) | <200ms | - |
+| Uptime production | >99% | - |
+
+---
+
+## 🎯 Prochaines Étapes Immédiates
+
+1. ✅ Créer ROADMAP.md (ce fichier)
+2. 🚧 Initialiser projet Spring Boot 3.x avec dépendances
+3. ⏳ Initialiser projet Angular 17+
+4. ⏳ Configuration i18n FR/EN backend et frontend
+5. ⏳ Configuration CORS, Swagger, profils
+
+---
+
+## 📝 Notes et Décisions Importantes
+
+### 2025-11-07
+- **Décision:** Utilisation de H2 en développement avec mode FILE pour persistance
+- **Décision:** PostgreSQL en production via Heroku addon
+- **Décision:** i18n obligatoire dès le début sur toutes les fonctionnalités
+- **Décision:** Audit logging complet pour conformité bancaire
+- **Décision:** Architecture monolithique au départ, microservices possibles en v2
+- **Décision:** RBAC avec permissions granulaires dès Phase 2
+- **Décision:** Tests unitaires obligatoires (>70% couverture) avant merge
+
+---
+
+**Dernière mise à jour:** 2025-11-07
+**Prochaine révision:** Fin de chaque phase

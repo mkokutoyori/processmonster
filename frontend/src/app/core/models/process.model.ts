@@ -322,3 +322,179 @@ export interface TaskAttachment {
   createdAt: string;
   createdBy: string;
 }
+
+// =============================================================================
+// Forms (Dynamic Forms)
+// =============================================================================
+
+/**
+ * Submission Status
+ */
+export type SubmissionStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'CANCELLED';
+
+/**
+ * Form Definition
+ */
+export interface FormDefinition {
+  id: number;
+  formKey: string;
+  name: string;
+  description?: string;
+  category?: string;
+  version: number;
+  schemaJson: string;
+  uiSchemaJson?: string;
+  published: boolean;
+  isLatestVersion: boolean;
+  processDefinitionKey?: string;
+  taskDefinitionKey?: string;
+  submissionCount: number;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+/**
+ * Create Form Definition Request
+ */
+export interface CreateFormDefinitionRequest {
+  formKey: string;
+  name: string;
+  description?: string;
+  category?: string;
+  schemaJson: string;
+  uiSchemaJson?: string;
+  processDefinitionKey?: string;
+  taskDefinitionKey?: string;
+}
+
+/**
+ * Update Form Definition Request
+ */
+export interface UpdateFormDefinitionRequest {
+  name: string;
+  description?: string;
+  category?: string;
+  schemaJson: string;
+  uiSchemaJson?: string;
+  processDefinitionKey?: string;
+  taskDefinitionKey?: string;
+}
+
+/**
+ * Form Submission
+ */
+export interface FormSubmission {
+  id: number;
+  formDefinitionId: number;
+  formKey: string;
+  formName: string;
+  formVersion: number;
+  taskId?: number;
+  processInstanceId?: number;
+  dataJson: string;
+  status: SubmissionStatus;
+  submittedBy: string;
+  submittedAt?: string;
+  businessKey?: string;
+  notes?: string;
+  validationErrors?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
+}
+
+/**
+ * Save Draft Request
+ */
+export interface SaveDraftRequest {
+  formDefinitionId: number;
+  dataJson: string;
+  businessKey?: string;
+  taskId?: number;
+  processInstanceId?: number;
+}
+
+/**
+ * Submit Form Request
+ */
+export interface SubmitFormRequest {
+  formDefinitionId: number;
+  dataJson: string;
+  businessKey?: string;
+  taskId?: number;
+  processInstanceId?: number;
+  notes?: string;
+}
+
+/**
+ * Form Schema (JSON Schema Draft 7)
+ */
+export interface FormSchema {
+  $schema?: string;
+  title?: string;
+  description?: string;
+  type: 'object';
+  properties: { [key: string]: FormSchemaProperty };
+  required?: string[];
+  additionalProperties?: boolean;
+}
+
+/**
+ * Form Schema Property
+ */
+export interface FormSchemaProperty {
+  type: 'string' | 'number' | 'integer' | 'boolean' | 'array' | 'object';
+  title?: string;
+  description?: string;
+  default?: any;
+  enum?: any[];
+  minimum?: number;
+  maximum?: number;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  format?: string; // date, date-time, email, uri, etc.
+  items?: FormSchemaProperty; // for arrays
+  properties?: { [key: string]: FormSchemaProperty }; // for objects
+  required?: string[];
+}
+
+/**
+ * UI Schema for rendering hints
+ */
+export interface UISchema {
+  [key: string]: UISchemaElement;
+}
+
+/**
+ * UI Schema Element
+ */
+export interface UISchemaElement {
+  'ui:widget'?: string; // text, textarea, select, radio, checkbox, date, email, etc.
+  'ui:placeholder'?: string;
+  'ui:help'?: string;
+  'ui:readonly'?: boolean;
+  'ui:disabled'?: boolean;
+  'ui:autofocus'?: boolean;
+  'ui:options'?: {
+    rows?: number;
+    label?: boolean;
+    inline?: boolean;
+    orderable?: boolean;
+    addable?: boolean;
+    removable?: boolean;
+  };
+  'ui:order'?: string[];
+}
+
+/**
+ * Validation Response
+ */
+export interface ValidationResponse {
+  valid: boolean;
+  errors?: string[];
+  message?: string;
+}

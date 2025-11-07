@@ -8,12 +8,16 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ProcessDefinitionService } from '../../core/services/process-definition.service';
 import { ProcessCategoryService } from '../../core/services/process-category.service';
+import { ProcessInstanceService } from '../../core/services/process-instance.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { ProcessDefinition, ProcessCategory } from '../../core/models/process.model';
+import { ProcessStartDialogComponent, ProcessStartResult } from './process-start-dialog.component';
 
 /**
  * Component for listing process definitions
@@ -31,6 +35,7 @@ import { ProcessDefinition, ProcessCategory } from '../../core/models/process.mo
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatDialogModule,
     ReactiveFormsModule
   ],
   template: `
@@ -116,6 +121,13 @@ import { ProcessDefinition, ProcessCategory } from '../../core/models/process.mo
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let process">
+              <button mat-icon-button
+                      *ngIf="process.published && process.active"
+                      (click)="startProcess(process)"
+                      matTooltip="Start Process"
+                      color="primary">
+                <mat-icon>play_arrow</mat-icon>
+              </button>
               <button mat-icon-button (click)="viewProcess(process)" matTooltip="View">
                 <mat-icon>visibility</mat-icon>
               </button>
@@ -241,7 +253,10 @@ export class ProcessListComponent implements OnInit {
   constructor(
     private processService: ProcessDefinitionService,
     private categoryService: ProcessCategoryService,
-    private router: Router
+    private instanceService: ProcessInstanceService,
+    private router: Router,
+    private dialog: MatDialog,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -343,6 +358,34 @@ export class ProcessListComponent implements OnInit {
 
   downloadBpmn(process: ProcessDefinition): void {
     this.processService.downloadBpmnXml(process.id, process.processKey);
+  }
+
+  startProcess(process: ProcessDefinition): void {
+    const dialogRef = this.dialog.open(ProcessStartDialogComponent, {
+      width: '700px',
+      data: { process }
+    });
+
+    dialogRef.afterClosed().subscribe((result: ProcessStartResult | null) => {
+      if (result) {
+        const request = {
+          processDefinitionId: process.id,
+          businessKey: result.businessKey,
+          variables: result.variables
+        };
+
+        this.instanceService.startProcess(request).subscribe({
+          next: (instance) => {
+            this.notificationService.success(`Process instance #${instance.id} started successfully!`);
+            this.router.navigate(['/instances', instance.id]);
+          },
+          error: (error) => {
+            console.error('Error starting process:', error);
+            this.notificationService.error(error.error?.message || 'Failed to start process');
+          }
+        });
+      }
+    });
   }
 
   deleteProcess(process: ProcessDefinition): void {

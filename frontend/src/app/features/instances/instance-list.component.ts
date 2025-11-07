@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ProcessInstanceService } from '../../core/services/process-instance.service';
+import { NotificationService } from '../../core/services/notification.service';
 import { ProcessInstance } from '../../core/models/process.model';
 
 /**
@@ -304,7 +305,8 @@ export class InstanceListComponent implements OnInit {
 
   constructor(
     private instanceService: ProcessInstanceService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -380,11 +382,12 @@ export class InstanceListComponent implements OnInit {
     const reason = prompt('Reason for suspension (optional):');
     this.instanceService.suspendInstance(instance.id, reason || undefined).subscribe({
       next: () => {
+        this.notificationService.success(`Instance #${instance.id} suspended successfully`);
         this.loadInstances();
       },
       error: (error) => {
         console.error('Error suspending instance:', error);
-        alert('Failed to suspend instance: ' + error.error?.message);
+        this.notificationService.error(error.error?.message || 'Failed to suspend instance');
       }
     });
   }
@@ -392,11 +395,12 @@ export class InstanceListComponent implements OnInit {
   resumeInstance(instance: ProcessInstance): void {
     this.instanceService.resumeInstance(instance.id).subscribe({
       next: () => {
+        this.notificationService.success(`Instance #${instance.id} resumed successfully`);
         this.loadInstances();
       },
       error: (error) => {
         console.error('Error resuming instance:', error);
-        alert('Failed to resume instance: ' + error.error?.message);
+        this.notificationService.error(error.error?.message || 'Failed to resume instance');
       }
     });
   }
@@ -406,11 +410,12 @@ export class InstanceListComponent implements OnInit {
     if (confirm(`Are you sure you want to terminate instance #${instance.id}?`)) {
       this.instanceService.terminateInstance(instance.id, reason || undefined).subscribe({
         next: () => {
+          this.notificationService.success(`Instance #${instance.id} terminated successfully`);
           this.loadInstances();
         },
         error: (error) => {
           console.error('Error terminating instance:', error);
-          alert('Failed to terminate instance: ' + error.error?.message);
+          this.notificationService.error(error.error?.message || 'Failed to terminate instance');
         }
       });
     }

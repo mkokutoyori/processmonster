@@ -399,8 +399,8 @@
 | Composant FormList | ✅ | 2025-11-08 | List, search, filter, duplicate, export JSON |
 | Composant field types (text, number, date, etc.) | ✅ | 2025-11-08 | 8 types: text, number, email, date, select, checkbox, textarea, radio |
 | Validation client (Reactive Forms) | ✅ | 2025-11-08 | Built-in validators + custom rules (minLength, maxLength, min, max, pattern) |
-| Gestion champs conditionnels | ⏳ | - | RxJS pour réactivité (à implémenter) |
-| Auto-save | ⏳ | - | Debounce + localStorage (à implémenter) |
+| Gestion champs conditionnels | ✅ | 2025-11-08 | RxJS valueChanges, 7 operators, AND logic, dynamic validators |
+| Auto-save | ✅ | 2025-11-08 | Debounce 2s avec RxJS Subject, silent background saves |
 | Preview formulaire | ✅ | 2025-11-08 | Live preview in FormBuilder right panel |
 
 ### Example Schemas
@@ -417,8 +417,13 @@
 - **Draft vs. Submit:** saveDraft() = JSON format check only, submitForm() = full validation
 - **Workflow:** DRAFT → SUBMITTED → APPROVED/REJECTED/CANCELLED
 - **UI Schema:** Support uiSchemaJson pour hints de rendu (ui:widget, ui:placeholder, etc.)
-- **Conditional Fields:** JSON Schema if/then/else pour champs conditionnels
-- **Frontend Builder:** À implémenter avec formio.js ou custom drag & drop (Phase future)
+- **Conditional Fields:**
+  - Backend: JSON Schema if/then/else
+  - Frontend: RxJS valueChanges avec 7 operators (equals, notEquals, contains, greaterThan, lessThan, isEmpty, isNotEmpty)
+  - Logic: AND for multiple conditions
+  - Validators dynamiquement activés/désactivés
+- **Frontend Builder:** Custom drag & drop avec Angular CDK (✅ implémenté)
+- **Auto-save:** Debounce 2s avec RxJS Subject, silent saves (✅ implémenté)
 - **Compliance:** Schemas incluent champs KYC, AML, PATRIOT Act, FCRA, E-Sign Act
 - **Security:** RBAC @PreAuthorize (FORM_READ, FORM_CREATE, FORM_UPDATE, FORM_DELETE)
 

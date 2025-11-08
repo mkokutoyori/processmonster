@@ -272,4 +272,159 @@ class TaskControllerTest {
                         .content("{}"))
                 .andExpect(status().isForbidden());
     }
+
+    // ========== Form Integration Tests ==========
+
+    @Test
+    @WithMockUser(authorities = {"TASK_READ"})
+    @DisplayName("Should get task form when task has formKey")
+    void shouldGetTaskForm() throws Exception {
+        // Given: Create task with formKey
+        Task taskWithForm = Task.builder()
+                .name("Loan Application Task")
+                .formKey("loan-application")
+                .camundaTaskId("camunda-123")
+                .status(TaskStatus.IN_PROGRESS)
+                .build();
+        taskWithForm = taskRepository.save(taskWithForm);
+
+        // When/Then
+        mockMvc.perform(get("/api/v1/tasks/" + taskWithForm.getId() + "/form"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.taskId").value(taskWithForm.getId()))
+                .andExpect(jsonPath("$.formKey").value("loan-application"));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"TASK_READ"})
+    @DisplayName("Should return 400 when task has no formKey")
+    void shouldReturn400WhenTaskHasNoFormKey() throws Exception {
+        mockMvc.perform(get("/api/v1/tasks/" + testTask.getId() + "/form"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(authorities = {"TASK_READ"})
+    @DisplayName("Should get task form in read-only mode")
+    void shouldGetTaskFormReadOnly() throws Exception {
+        // Given: Create completed task with formKey
+        Task completedTask = Task.builder()
+                .name("Completed Loan Application")
+                .formKey("loan-application")
+                .camundaTaskId("camunda-456")
+                .status(TaskStatus.COMPLETED)
+                .build();
+        completedTask = taskRepository.save(completedTask);
+
+        // When/Then
+        mockMvc.perform(get("/api/v1/tasks/" + completedTask.getId() + "/form/readonly"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.readOnly").value(true));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"TASK_READ"})
+    @DisplayName("Should return 404 when task has no form for read-only")
+    void shouldReturn404WhenNoFormForReadOnly() throws Exception {
+        mockMvc.perform(get("/api/v1/tasks/" + testTask.getId() + "/form/readonly"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(authorities = {"TASK_UPDATE"})
+    @DisplayName("Should submit task form successfully")
+    void shouldSubmitTaskForm() throws Exception {
+        // Given: Create task with formKey
+        Task taskWithForm = Task.builder()
+                .name("Loan Application Task")
+                .formKey("loan-application")
+                .camundaTaskId("camunda-789")
+                .status(TaskStatus.IN_PROGRESS)
+                .assignee("testuser")
+                .build();
+        taskWithForm = taskRepository.save(taskWithForm);
+
+        String formData = """
+                {
+                    "loanAmount": 50000,
+                    "duration": 24,
+                    "purpose": "Home renovation"
+                }
+                """;
+
+        // When/Then
+        mockMvc.perform(post("/api/v1/tasks/" + taskWithForm.getId() + "/submit-form")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(formData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(taskWithForm.getId()));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"TASK_READ"})
+    @DisplayName("Should validate task form")
+    void shouldValidateTaskForm() throws Exception {
+        // Given: Create task with formKey
+        Task taskWithForm = Task.builder()
+                .name("Loan Application Task")
+                .formKey("loan-application")
+                .camundaTaskId("camunda-999")
+                .status(TaskStatus.IN_PROGRESS)
+                .build();
+        taskWithForm = taskRepository.save(taskWithForm);
+
+        String formData = """
+                {
+                    "loanAmount": 50000,
+                    "duration": 24
+                }
+                """;
+
+        // When/Then
+        mockMvc.perform(post("/api/v1/tasks/" + taskWithForm.getId() + "/validate-form")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(formData))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.taskId").value(taskWithForm.getId()));
+    }
+
+    @Test
+    @WithMockUser(authorities = {"TASK_UPDATE"})
+    @DisplayName("Should return 400 when submitting invalid form data")
+    void shouldReturn400WhenSubmittingInvalidFormData() throws Exception {
+        // Given: Create task with formKey
+        Task taskWithForm = Task.builder()
+                .name("Loan Application Task")
+                .formKey("loan-application")
+                .camundaTaskId("camunda-111")
+                .status(TaskStatus.IN_PROGRESS)
+                .build();
+        taskWithForm = taskRepository.save(taskWithForm);
+
+        String invalidFormData = """
+                {
+                    "loanAmount": -1000,
+                    "duration": 0
+                }
+                """;
+
+        // When/Then
+        mockMvc.perform(post("/api/v1/tasks/" + taskWithForm.getId() + "/submit-form")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidFormData))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(authorities = {})
+    @DisplayName("Should return 403 when insufficient permissions for form endpoints")
+    void shouldReturn403ForFormEndpointsWhenInsufficientPermissions() throws Exception {
+        mockMvc.perform(get("/api/v1/tasks/" + testTask.getId() + "/form"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/api/v1/tasks/" + testTask.getId() + "/submit-form")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isForbidden());
+    }
 }

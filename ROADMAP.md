@@ -513,10 +513,10 @@
 | Models TypeScript (10) | ✅ | 2025-11-08 | ApiKey, ApiKeyCreated, CreateApiKeyRequest, UpdateApiKeyRequest, Webhook, CreateWebhookRequest, UpdateWebhookRequest, WebhookDelivery |
 | Service ApiKeyService | ✅ | 2025-11-08 | 10 méthodes API (CRUD, enable/disable, search, stats) |
 | Service WebhookService | ✅ | 2025-11-08 | 11 méthodes API (CRUD, enable/disable, test, delivery history, stats) |
-| Page gestion API keys | ⏳ | - | À implémenter (futur) |
-| Page configuration webhooks | ⏳ | - | À implémenter (futur) |
-| Page documentation API | ⏳ | - | À implémenter (futur) |
-| Logs webhooks | ⏳ | - | À implémenter (futur) |
+| Page gestion API keys | ✅ | 2025-11-08 | ApiKeysComponent (standalone) - Mat-table with search, pagination, enable/disable, delete |
+| Page configuration webhooks | ✅ | 2025-11-08 | WebhooksComponent (standalone) - Mat-table with search, test, enable/disable, deliveries |
+| Page documentation API | ⏳ | - | À implémenter (futur) - Swagger UI integration |
+| Logs webhooks | ⏳ | - | À implémenter (futur) - Detailed delivery logs view |
 
 ### Décisions techniques
 - **API Keys:** SecureRandom + Base64 (32 bytes), SHA-256 hashing, never store plain text
@@ -594,10 +594,10 @@
 | Models TypeScript (4 interfaces + 5 enums) | ✅ | 2025-11-08 | AuditLog, AuditStats, FailedLoginCount, SystemParameter, CreateSystemParameterRequest, UpdateSystemParameterRequest, SystemConfiguration, AdminStats, AuditSeverity, AuditAction, SystemParameterDataType, SystemParameterCategory |
 | Service AuditService | ✅ | 2025-11-08 | 11 methods: getAllLogs, getLogsByUsername, getLogsByAction, getLogsByEntity, getLogsByDateRange, getSecurityLogs, getFailedActions, searchLogs, getRecentUserLogs, getFailedLoginCount, getAuditStats |
 | Service AdminService | ✅ | 2025-11-08 | 14 methods: createParameter, getParameterById, getAllParameters, getParametersByCategory, getEditableParameters, getAllCategories, searchParameters, updateParameter, updateParameterValue, resetToDefault, deleteParameter, getSystemConfiguration, getSystemConfigurationByCategory, getAdminStats |
-| Page audit logs | ⏳ | - | UI à implémenter (futur) |
-| Page administration système | ⏳ | - | UI à implémenter (futur) |
-| Dashboard admin | ⏳ | - | UI à implémenter (futur) |
-| Filtres audit avancés | ⏳ | - | UI à implémenter (futur) |
+| Page audit logs | ✅ | 2025-11-08 | AuditLogsComponent (standalone) - Mat-table with tabs (All/Security/Failed), filters (search, severity, daterange), pagination |
+| Page administration système | ✅ | 2025-11-08 | SystemParametersComponent (standalone) - Mat-accordion by category, stats card, search/filter, edit/reset actions |
+| Dashboard admin | ✅ | 2025-11-08 | Integrated in SystemParametersComponent - Stats card with totalParameters, totalCategories, editableParameters, encryptedParameters |
+| Filtres audit avancés | ✅ | 2025-11-08 | Integrated in AuditLogsComponent - Search, severity, date range, tab filtering (All/Security/Failed) |
 
 ### Décisions techniques
 - **Audit:** Tous les CUD (Create/Update/Delete), auth, accès sensibles

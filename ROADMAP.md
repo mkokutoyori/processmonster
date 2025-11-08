@@ -423,46 +423,57 @@
 ---
 
 ## 📈 Phase 8 - Monitoring et Reporting
-**Statut:** ⏳ Planifié
-**Début estimé:** Après Phase 7
-**Fin estimée:** -
+**Statut:** ✅ Terminé (Core) - UI à venir
+**Début:** 2025-11-07
+**Fin:** 2025-11-07
 
 ### Tâches Backend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Service MetricsService | ⏳ | - | Calcul KPIs |
-| Service ReportService | ⏳ | - | Génération rapports |
-| Service ExportService | ⏳ | - | Export PDF/Excel |
-| Controller DashboardController | ⏳ | - | REST API |
-| Endpoint GET /api/dashboard/kpis | ⏳ | - | KPIs temps réel |
-| Endpoint GET /api/dashboard/process-stats | ⏳ | - | Stats par processus |
-| Endpoint GET /api/dashboard/user-stats | ⏳ | - | Stats par utilisateur |
-| Endpoint GET /api/reports/generate | ⏳ | - | Génération rapport paramétré |
-| Endpoint GET /api/reports/{id}/download | ⏳ | - | Téléchargement |
-| KPIs (nb processus actifs, tâches en retard, temps moyen, etc.) | ⏳ | - | Requêtes optimisées |
-| Génération PDF (iText/Flying Saucer) | ⏳ | - | Templates HTML→PDF |
-| Génération Excel (Apache POI) | ⏳ | - | XLS/XLSX |
-| Cache métriques | ⏳ | - | Caffeine 5min TTL |
+| Service MetricsService | ✅ | 2025-11-07 | 7 méthodes de calcul KPIs, tous cached 5min |
+| DTOs dashboard (5) | ✅ | 2025-11-07 | SystemKPIs, StatusStats, UserTaskStats, ProcessDefinitionStats, DailyCompletionTrend |
+| Controller DashboardController | ✅ | 2025-11-07 | 7 REST endpoints avec OpenAPI |
+| Endpoint GET /api/v1/dashboard/kpis | ✅ | 2025-11-07 | KPIs système (12 métriques) |
+| Endpoint GET /api/v1/dashboard/process-stats | ✅ | 2025-11-07 | Stats processus par statut |
+| Endpoint GET /api/v1/dashboard/task-stats | ✅ | 2025-11-07 | Stats tâches par statut |
+| Endpoint GET /api/v1/dashboard/task-priority-stats | ✅ | 2025-11-07 | Stats tâches par priorité |
+| Endpoint GET /api/v1/dashboard/user-stats | ✅ | 2025-11-07 | Stats performance utilisateur |
+| Endpoint GET /api/v1/dashboard/completion-trend | ✅ | 2025-11-07 | Tendance complétion quotidienne |
+| Endpoint GET /api/v1/dashboard/process-definition-stats/{key} | ✅ | 2025-11-07 | Stats par définition de processus |
+| KPIs (nb processus actifs, tâches en retard, temps moyen, etc.) | ✅ | 2025-11-07 | 12 KPIs calculés |
+| Cache métriques | ✅ | 2025-11-07 | Caffeine 5min TTL sur toutes les métriques |
+| Repository enhancements | ✅ | 2025-11-07 | 15 nouvelles méthodes (ProcessInstanceRepository + TaskRepository) |
+| i18n messages FR/EN | ✅ | 2025-11-07 | 15 messages dashboard.* |
+| Service ReportService | ⏳ | - | À implémenter Phase future |
+| Service ExportService | ⏳ | - | À implémenter Phase future |
+| Endpoint GET /api/reports/generate | ⏳ | - | À implémenter Phase future |
+| Endpoint GET /api/reports/{id}/download | ⏳ | - | À implémenter Phase future |
+| Génération PDF (iText/Flying Saucer) | ⏳ | - | À implémenter Phase future |
+| Génération Excel (Apache POI) | ⏳ | - | À implémenter Phase future |
 
 ### Tâches Frontend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Service DashboardService | ⏳ | - | API calls |
-| Page dashboard principal | ⏳ | - | Vue d'ensemble |
-| Composants KPI cards | ⏳ | - | Cartes métriques |
-| Graphiques Chart.js (line, bar, pie, doughnut) | ⏳ | - | Visualisations |
-| Filtres période (jour, semaine, mois, année, custom) | ⏳ | - | Date range picker |
-| Page rapports | ⏳ | - | Configuration et génération |
-| Modal configuration rapport | ⏳ | - | Sélection paramètres |
-| Download PDF/Excel | ⏳ | - | Boutons export |
-| Refresh automatique dashboard | ⏳ | - | Polling 30s |
+| Models TypeScript (6) | ✅ | 2025-11-07 | SystemKPIs, StatusStats, UserTaskStats, ProcessDefinitionStats, DailyCompletionTrend |
+| Service DashboardService | ✅ | 2025-11-07 | 7 méthodes API complètes |
+| Page dashboard principal | ⏳ | - | À implémenter Phase future |
+| Composants KPI cards | ⏳ | - | À implémenter Phase future |
+| Graphiques Chart.js (line, bar, pie, doughnut) | ⏳ | - | À implémenter Phase future |
+| Filtres période (jour, semaine, mois, année, custom) | ⏳ | - | À implémenter Phase future |
+| Page rapports | ⏳ | - | À implémenter Phase future |
+| Modal configuration rapport | ⏳ | - | À implémenter Phase future |
+| Download PDF/Excel | ⏳ | - | À implémenter Phase future |
+| Refresh automatique dashboard | ⏳ | - | À implémenter Phase future |
 
 ### Décisions techniques
-- **Charts:** Chart.js avec ng2-charts wrapper
-- **PDF:** iText pour génération côté serveur
-- **Excel:** Apache POI
-- **Cache:** Caffeine pour éviter recalculs fréquents
-- **Async:** Rapports lourds en async avec notification
+- **Metrics:** MetricsService avec 7 méthodes (getSystemKPIs, getProcessStatsByStatus, getTaskStatsByStatus, getTaskStatsByPriority, getUserTaskStats, getDailyTaskCompletionTrend, getProcessDefinitionStats)
+- **Cache:** Caffeine @Cacheable avec TTL 5 minutes sur toutes les métriques
+- **Performance:** Requêtes optimisées avec JPA, aggregations Java Streams
+- **Security:** RBAC avec DASHBOARD_VIEW, ROLE_ADMIN, ROLE_MANAGER, ROLE_ANALYST
+- **Charts:** Chart.js avec ng2-charts wrapper (à intégrer)
+- **PDF:** iText pour génération côté serveur (futur)
+- **Excel:** Apache POI (futur)
+- **Async:** Rapports lourds en async avec notification (futur)
 
 ---
 

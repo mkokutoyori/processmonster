@@ -394,13 +394,14 @@
 |-------|--------|------|-------|
 | Models TypeScript | ✅ | 2025-11-07 | 12 interfaces: FormDefinition, FormSubmission, FormSchema, FormSchemaProperty, UISchema, etc. |
 | Service FormService | ✅ | 2025-11-07 | 24 méthodes API + 4 helpers (parseSchema, stringifyFormData, etc.) |
-| Composant FormBuilder | ⏳ | - | À implémenter Phase suivante |
-| Composant FormRenderer | ⏳ | - | À implémenter Phase suivante |
-| Composant field types (text, number, date, etc.) | ⏳ | - | À implémenter Phase suivante |
-| Validation client (Reactive Forms) | ⏳ | - | À implémenter Phase suivante |
-| Gestion champs conditionnels | ⏳ | - | RxJS pour réactivité |
-| Auto-save | ⏳ | - | Debounce + localStorage |
-| Preview formulaire | ⏳ | - | Mode aperçu |
+| Composant FormBuilder | ✅ | 2025-11-08 | Drag-and-drop builder, 8 field types, validation rules, live preview |
+| Composant FormRenderer | ✅ | 2025-11-08 | Dynamic rendering, reactive forms, all field types, validation |
+| Composant FormList | ✅ | 2025-11-08 | List, search, filter, duplicate, export JSON |
+| Composant field types (text, number, date, etc.) | ✅ | 2025-11-08 | 8 types: text, number, email, date, select, checkbox, textarea, radio |
+| Validation client (Reactive Forms) | ✅ | 2025-11-08 | Built-in validators + custom rules (minLength, maxLength, min, max, pattern) |
+| Gestion champs conditionnels | ⏳ | - | RxJS pour réactivité (à implémenter) |
+| Auto-save | ⏳ | - | Debounce + localStorage (à implémenter) |
+| Preview formulaire | ✅ | 2025-11-08 | Live preview in FormBuilder right panel |
 
 ### Example Schemas
 | Tâche | Statut | Date | Notes |

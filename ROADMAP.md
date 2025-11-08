@@ -208,11 +208,11 @@
 | Composant ProcessList | ✅ | 2025-11-07 | Material Table, pagination, search, filters |
 | Routes processes | ✅ | 2025-11-07 | Lazy loading configuration |
 | Page création processus | ✅ | 2025-11-08 | Multi-step wizard (blank/template/import) |
-| Composant BpmnEditor | ⏳ | - | À implémenter Phase suivante |
-| Page éditeur processus | ⏳ | - | bpmn-js + toolbar |
+| Composant BpmnEditor | ✅ | 2025-11-08 | bpmn-js integration with toolbar |
+| Page éditeur processus | ✅ | 2025-11-08 | Full editor with save/load/export |
 | Modal import BPMN | ✅ | 2025-11-08 | File upload in creation wizard |
-| Palette BPMN personnalisée | ⏳ | - | Éléments bancaires |
-| Validation visuelle | ⏳ | - | Erreurs en temps réel |
+| Palette BPMN personnalisée | ⏳ | - | Éléments bancaires (future enhancement) |
+| Validation visuelle | ✅ | 2025-11-08 | BPMN XML validation with user feedback |
 
 ### Décisions techniques
 - **BPMN:** Standard BPMN 2.0 XML avec validation XSD
@@ -264,7 +264,7 @@
 | Service ProcessInstanceService | ✅ | 2025-11-07 | 11 méthodes API complètes |
 | Page liste instances | ✅ | 2025-11-07 | Material table, filters, pagination, status chips |
 | Page détail instance | ✅ | 2025-11-07 | Tabs (overview, history, variables), actions (suspend/resume/cancel) |
-| Composant visualisation BPMN | ⏳ | - | À implémenter (bpmn-js integration) |
+| Composant visualisation BPMN | ✅ | 2025-11-08 | BpmnEditorComponent (reusable for viewing) |
 | Modal variables processus | ✅ | 2025-11-07 | Expansion panel in detail view |
 | Page historique exécution | ✅ | 2025-11-07 | Timeline view in detail tab |
 | Actions suspend/resume/cancel | ✅ | 2025-11-07 | Action buttons with confirmation |

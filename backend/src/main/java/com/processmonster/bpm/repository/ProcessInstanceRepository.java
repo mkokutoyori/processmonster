@@ -121,4 +121,39 @@ public interface ProcessInstanceRepository extends JpaRepository<ProcessInstance
     @Query("SELECT pi FROM ProcessInstance pi WHERE pi.status = 'FAILED' " +
            "AND pi.deleted = false ORDER BY pi.endTime DESC")
     Page<ProcessInstance> findFailedInstances(Pageable pageable);
+
+    /**
+     * Find all instances (not deleted) - List version
+     */
+    List<ProcessInstance> findByDeletedFalse();
+
+    /**
+     * Count all instances (not deleted)
+     */
+    long countByDeletedFalse();
+
+    /**
+     * Count instances by status (not deleted)
+     */
+    long countByStatusAndDeletedFalse(ProcessInstanceStatus status);
+
+    /**
+     * Count instances by status with end time after given date
+     */
+    @Query("SELECT COUNT(pi) FROM ProcessInstance pi WHERE pi.status = :status " +
+           "AND pi.endTime > :endTime AND pi.deleted = false")
+    long countByStatusAndEndTimeAfterAndDeletedFalse(
+            @Param("status") ProcessInstanceStatus status,
+            @Param("endTime") LocalDateTime endTime);
+
+    /**
+     * Find instances by process definition key (not deleted)
+     */
+    @Query("SELECT pi FROM ProcessInstance pi WHERE pi.processDefinition.processKey = :processKey AND pi.deleted = false")
+    List<ProcessInstance> findByProcessDefinitionKeyAndDeletedFalse(@Param("processKey") String processKey);
+
+    /**
+     * Find instances by status (not deleted) - List version
+     */
+    List<ProcessInstance> findByStatusAndDeletedFalse(ProcessInstanceStatus status);
 }

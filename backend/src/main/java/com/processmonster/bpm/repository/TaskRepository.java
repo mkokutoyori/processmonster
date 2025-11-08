@@ -124,4 +124,74 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
            "AND t.status IN ('ASSIGNED', 'IN_PROGRESS') " +
            "AND t.deleted = false")
     List<Task> findHighPriorityTasksByAssignee(@Param("assignee") String assignee);
+
+    /**
+     * Find all tasks (not deleted) - List version
+     */
+    List<Task> findByDeletedFalse();
+
+    /**
+     * Count all tasks (not deleted)
+     */
+    long countByDeletedFalse();
+
+    /**
+     * Count tasks by status list
+     */
+    long countByStatusInAndDeletedFalse(List<TaskStatus> statuses);
+
+    /**
+     * Count tasks by status and completed after date
+     */
+    @Query("SELECT COUNT(t) FROM Task t WHERE t.status = :status " +
+           "AND t.completedAt > :completedAt AND t.deleted = false")
+    long countByStatusAndCompletedAtAfterAndDeletedFalse(
+            @Param("status") TaskStatus status,
+            @Param("completedAt") LocalDateTime completedAt);
+
+    /**
+     * Find tasks by status and completed after date
+     */
+    @Query("SELECT t FROM Task t WHERE t.status = :status " +
+           "AND t.completedAt > :completedAt AND t.deleted = false")
+    List<Task> findByStatusAndCompletedAtAfterAndDeletedFalse(
+            @Param("status") TaskStatus status,
+            @Param("completedAt") LocalDateTime completedAt);
+
+    /**
+     * Count tasks by assignee username
+     */
+    @Query("SELECT COUNT(t) FROM Task t WHERE t.assignee.username = :username AND t.deleted = false")
+    long countByAssigneeUsernameAndDeletedFalse(@Param("username") String username);
+
+    /**
+     * Count tasks by assignee username and status
+     */
+    @Query("SELECT COUNT(t) FROM Task t WHERE t.assignee.username = :username " +
+           "AND t.status = :status AND t.deleted = false")
+    long countByAssigneeUsernameAndStatusAndDeletedFalse(
+            @Param("username") String username,
+            @Param("status") TaskStatus status);
+
+    /**
+     * Find tasks by assignee username and status
+     */
+    @Query("SELECT t FROM Task t WHERE t.assignee.username = :username " +
+           "AND t.status = :status AND t.deleted = false")
+    List<Task> findByAssigneeUsernameAndStatusAndDeletedFalse(
+            @Param("username") String username,
+            @Param("status") TaskStatus status);
+
+    /**
+     * Find overdue tasks - List version
+     */
+    @Query("SELECT t FROM Task t WHERE t.dueDate < :now " +
+           "AND t.status IN ('CREATED', 'ASSIGNED', 'IN_PROGRESS') " +
+           "AND t.deleted = false")
+    List<Task> findOverdueTasks(@Param("now") LocalDateTime now);
+
+    /**
+     * Find tasks by status - List version
+     */
+    List<Task> findByStatusAndDeletedFalse(TaskStatus status);
 }

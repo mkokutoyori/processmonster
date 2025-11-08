@@ -1,12 +1,14 @@
 package com.processmonster.bpm.controller;
 
 import com.processmonster.bpm.dto.task.*;
+import com.processmonster.bpm.dto.TaskFormDataDTO;
 import com.processmonster.bpm.entity.Task;
 import com.processmonster.bpm.entity.Task.TaskStatus;
 import com.processmonster.bpm.entity.TaskAttachment;
 import com.processmonster.bpm.entity.TaskComment;
 import com.processmonster.bpm.mapper.TaskMapper;
 import com.processmonster.bpm.service.FileStorageService;
+import com.processmonster.bpm.service.FormTaskService;
 import com.processmonster.bpm.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,6 +41,7 @@ import java.util.stream.Collectors;
 public class TaskController {
 
     private final TaskService taskService;
+    private final FormTaskService formTaskService;
     private final TaskMapper taskMapper;
     private final FileStorageService fileStorageService;
 
@@ -328,6 +331,52 @@ public class TaskController {
     @Operation(summary = "Count overdue tasks", description = "Get count of all overdue tasks")
     public ResponseEntity<Long> countOverdueTasks() {
         return ResponseEntity.ok(taskService.countOverdueTasks());
+    }
+
+    // Forms
+
+    @GetMapping("/{id}/form")
+    @PreAuthorize("hasAnyAuthority('TASK_READ', 'ROLE_ADMIN')")
+    @Operation(summary = "Get task form", description = "Retrieve the form associated with a task, pre-filled with process variables")
+    public ResponseEntity<TaskFormDataDTO> getTaskForm(@PathVariable Long id) {
+        TaskFormDataDTO formData = formTaskService.getTaskForm(id);
+        return ResponseEntity.ok(formData);
+    }
+
+    @GetMapping("/{id}/form/readonly")
+    @PreAuthorize("hasAnyAuthority('TASK_READ', 'ROLE_ADMIN')")
+    @Operation(summary = "Get task form (read-only)", description = "Retrieve the form for a completed task in read-only mode")
+    public ResponseEntity<TaskFormDataDTO> getTaskFormReadOnly(@PathVariable Long id) {
+        TaskFormDataDTO formData = formTaskService.getTaskFormReadOnly(id);
+        if (formData == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(formData);
+    }
+
+    @PostMapping("/{id}/submit-form")
+    @PreAuthorize("hasAnyAuthority('TASK_UPDATE', 'ROLE_ADMIN')")
+    @Operation(summary = "Submit task form", description = "Submit form data and complete the task. Validates form data and maps it to process variables.")
+    public ResponseEntity<TaskDTO> submitTaskForm(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> formData) {
+
+        Task completed = formTaskService.submitTaskForm(id, formData);
+        return ResponseEntity.ok(taskMapper.toDTO(completed));
+    }
+
+    @PostMapping("/{id}/validate-form")
+    @PreAuthorize("hasAnyAuthority('TASK_READ', 'ROLE_ADMIN')")
+    @Operation(summary = "Validate task form", description = "Validate form data without submitting the task")
+    public ResponseEntity<Map<String, Object>> validateTaskForm(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> formData) {
+
+        boolean isValid = formTaskService.validateTaskFormData(id, formData);
+        return ResponseEntity.ok(Map.of(
+            "valid", isValid,
+            "taskId", id
+        ));
     }
 
     // Helper methods

@@ -155,4 +155,21 @@ export class TaskService {
   countOverdueTasks(): Observable<number> {
     return this.http.get<number>(`${this.apiUrl}/stats/overdue-count`);
   }
+
+  // Forms
+  getTaskForm(taskId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${taskId}/form`);
+  }
+
+  getTaskFormReadOnly(taskId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/${taskId}/form/readonly`);
+  }
+
+  submitTaskForm(taskId: number, formData: any): Observable<Task> {
+    return this.http.post<Task>(`${this.apiUrl}/${taskId}/submit-form`, formData);
+  }
+
+  validateTaskForm(taskId: number, formData: any): Observable<{ valid: boolean; taskId: number }> {
+    return this.http.post<{ valid: boolean; taskId: number }>(`${this.apiUrl}/${taskId}/validate-form`, formData);
+  }
 }

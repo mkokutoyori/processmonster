@@ -10,10 +10,12 @@ import { MatListModule } from '@angular/material/list';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatBadgeModule } from '@angular/material/badge';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TaskService } from '../../core/services/task.service';
 import { NotificationService } from '../../core/services/notification.service';
 import { Task, TaskComment, TaskAttachment, TaskStatus, TaskPriority } from '../../core/models/process.model';
+import { FormRendererComponent } from '../forms/form-renderer.component';
 
 /**
  * Component for viewing task details
@@ -32,7 +34,9 @@ import { Task, TaskComment, TaskAttachment, TaskStatus, TaskPriority } from '../
     MatTooltipModule,
     MatFormFieldModule,
     MatInputModule,
-    ReactiveFormsModule
+    MatBadgeModule,
+    ReactiveFormsModule,
+    FormRendererComponent
   ],
   template: `
     <div class="task-detail-container" *ngIf="task">
@@ -55,6 +59,10 @@ import { Task, TaskComment, TaskAttachment, TaskStatus, TaskPriority } from '../
               <mat-chip *ngIf="task.isOverdue" class="overdue-chip">
                 <mat-icon>warning</mat-icon>
                 OVERDUE
+              </mat-chip>
+              <mat-chip *ngIf="task.formKey" class="form-required-chip">
+                <mat-icon>assignment</mat-icon>
+                FORM REQUIRED
               </mat-chip>
             </div>
           </div>
@@ -296,6 +304,43 @@ import { Task, TaskComment, TaskAttachment, TaskStatus, TaskPriority } from '../
             </mat-card>
           </div>
         </mat-tab>
+
+        <!-- Form Tab -->
+        <mat-tab *ngIf="task.formKey" label="Form">
+          <div class="tab-content">
+            <div *ngIf="taskFormData && taskFormData.formDefinition">
+              <app-form-renderer
+                [formDefinition]="taskFormData.formDefinition"
+                [initialValues]="taskFormData.initialValues"
+                [readOnly]="taskFormData.readOnly || task.status === 'COMPLETED' || task.status === 'CANCELLED'"
+                (formSubmit)="onFormSubmit($event)">
+              </app-form-renderer>
+
+              <div class="form-actions" *ngIf="task.status === 'IN_PROGRESS'">
+                <button mat-raised-button
+                        color="primary"
+                        (click)="completeTaskWithForm()"
+                        [disabled]="!isFormValid">
+                  <mat-icon>check_circle</mat-icon>
+                  Complete Task with Form
+                </button>
+              </div>
+            </div>
+
+            <div *ngIf="!taskFormData && task.formKey" class="loading-form">
+              <p>Loading form...</p>
+            </div>
+
+            <div *ngIf="formLoadError" class="error-message">
+              <mat-icon>error</mat-icon>
+              <p>{{ formLoadError }}</p>
+              <button mat-stroked-button (click)="loadTaskForm()">
+                <mat-icon>refresh</mat-icon>
+                Retry
+              </button>
+            </div>
+          </div>
+        </mat-tab>
       </mat-tab-group>
     </div>
   `,
@@ -408,6 +453,42 @@ import { Task, TaskComment, TaskAttachment, TaskStatus, TaskPriority } from '../
     .overdue-chip {
       background-color: #f44336 !important;
       color: white !important;
+    }
+
+    .form-required-chip {
+      background-color: #9c27b0 !important;
+      color: white !important;
+    }
+
+    /* Form Section */
+    .form-actions {
+      margin-top: 24px;
+      padding: 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .loading-form {
+      padding: 48px;
+      text-align: center;
+      color: #666;
+    }
+
+    .error-message {
+      padding: 24px;
+      text-align: center;
+      color: #f44336;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .error-message mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
     }
 
     /* Comment Section */
@@ -601,6 +682,12 @@ export class TaskDetailComponent implements OnInit {
   attachments: TaskAttachment[] = [];
   selectedFile: File | null = null;
 
+  // Form integration
+  taskFormData: any = null;
+  formLoadError: string = '';
+  isFormValid: boolean = false;
+  submittedFormData: any = null;
+
   commentForm: FormGroup;
 
   constructor(
@@ -621,6 +708,7 @@ export class TaskDetailComponent implements OnInit {
       this.loadTask(+id);
       this.loadComments();
       this.loadAttachments();
+      this.loadTaskForm();
     }
   }
 
@@ -712,6 +800,12 @@ export class TaskDetailComponent implements OnInit {
 
   completeTask(): void {
     if (this.task) {
+      // If task has a form, redirect to form tab
+      if (this.task.formKey && this.task.status === 'IN_PROGRESS') {
+        this.notificationService.info('Please fill out the form to complete this task');
+        return;
+      }
+
       this.taskService.completeTask(this.task.id).subscribe({
         next: () => {
           this.notificationService.success('Task completed successfully');
@@ -723,6 +817,75 @@ export class TaskDetailComponent implements OnInit {
         }
       });
     }
+  }
+
+  loadTaskForm(): void {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) return;
+
+    // Only load form if task has formKey
+    this.taskService.getTaskById(+id).subscribe({
+      next: (task) => {
+        if (!task.formKey) return;
+
+        // Load the form
+        const formObservable = task.status === 'COMPLETED' || task.status === 'CANCELLED'
+          ? this.taskService.getTaskFormReadOnly(+id)
+          : this.taskService.getTaskForm(+id);
+
+        formObservable.subscribe({
+          next: (formData) => {
+            this.taskFormData = formData;
+            this.formLoadError = '';
+          },
+          error: (error) => {
+            console.error('Error loading task form:', error);
+            this.formLoadError = error.error?.message || 'Failed to load form';
+          }
+        });
+      }
+    });
+  }
+
+  onFormSubmit(formData: any): void {
+    this.submittedFormData = formData;
+    this.isFormValid = true;
+  }
+
+  completeTaskWithForm(): void {
+    if (!this.task || !this.submittedFormData) {
+      this.notificationService.error('Please fill out the form before completing');
+      return;
+    }
+
+    // Validate form first
+    this.taskService.validateTaskForm(this.task.id, this.submittedFormData).subscribe({
+      next: (validation) => {
+        if (!validation.valid) {
+          this.notificationService.error('Form validation failed. Please check all required fields.');
+          return;
+        }
+
+        // Submit the form
+        this.taskService.submitTaskForm(this.task!.id, this.submittedFormData).subscribe({
+          next: () => {
+            this.notificationService.success('Task completed successfully with form data');
+            this.loadTask(this.task!.id);
+            this.taskFormData = null;
+            this.submittedFormData = null;
+            this.isFormValid = false;
+          },
+          error: (error) => {
+            console.error('Error submitting task form:', error);
+            this.notificationService.error(error.error?.message || 'Failed to submit form');
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error validating form:', error);
+        this.notificationService.error('Form validation error');
+      }
+    });
   }
 
   cancelTask(): void {

@@ -14,6 +14,8 @@ import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartData } from 'chart.js';
 import { ReportService } from '../../core/services/report.service';
 
 /**
@@ -37,7 +39,8 @@ import { ReportService } from '../../core/services/report.service';
     MatTableModule,
     MatChipsModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    BaseChartDirective
   ],
   template: `
     <div class="reports-container">
@@ -179,10 +182,11 @@ import { ReportService } from '../../core/services/report.service';
                 <mat-card-title>Instance Trend</mat-card-title>
               </mat-card-header>
               <mat-card-content>
-                <div class="chart-placeholder">
-                  <mat-icon>insert_chart</mat-icon>
-                  <p>Chart visualization (Chart.js/ngx-charts integration)</p>
-                </div>
+                <canvas baseChart
+                        [data]="instanceTrendChartData"
+                        [options]="lineChartOptions"
+                        [type]="'line'">
+                </canvas>
               </mat-card-content>
             </mat-card>
           </div>
@@ -444,22 +448,13 @@ import { ReportService } from '../../core/services/report.service';
       margin-top: 24px;
     }
 
-    .chart-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 64px;
-      background: #f5f5f5;
-      border-radius: 8px;
-      color: #999;
+    .chart-card mat-card-content {
+      padding: 16px;
+      min-height: 300px;
     }
 
-    .chart-placeholder mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      margin-bottom: 16px;
+    .chart-card canvas {
+      max-height: 300px !important;
     }
 
     .performance-table,
@@ -579,6 +574,49 @@ export class ReportsComponent implements OnInit {
 
   userActivity: any[] = [];
   activityColumns: string[] = ['username', 'tasksCompleted', 'instancesStarted', 'avgResponseTime', 'productivity'];
+
+  // Chart Data
+  instanceTrendChartData: ChartData<'line'> = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    datasets: [
+      {
+        label: 'Completed',
+        data: [65, 59, 80, 81, 56, 55, 40],
+        borderColor: '#4caf50',
+        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+        fill: true,
+        tension: 0.4
+      },
+      {
+        label: 'Failed',
+        data: [28, 48, 40, 19, 86, 27, 90],
+        borderColor: '#f44336',
+        backgroundColor: 'rgba(244, 67, 54, 0.1)',
+        fill: true,
+        tension: 0.4
+      }
+    ]
+  };
+
+  lineChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top'
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
 
   constructor(
     private reportService: ReportService,

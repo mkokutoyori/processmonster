@@ -674,6 +674,83 @@
 
 ---
 
+## 🚀 Phase 11 - Configuration de Déploiement
+**Statut:** ✅ Terminé
+**Début:** 2025-11-08
+**Fin:** 2025-11-08
+
+### Tâches Docker
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Dockerfile backend | ✅ | 2025-11-08 | Multi-stage build, JRE 17, non-root user, health checks |
+| Dockerfile frontend | ✅ | 2025-11-08 | Multi-stage build, Nginx Alpine, gzip, security headers |
+| .dockerignore backend | ✅ | 2025-11-08 | Optimisation du contexte de build |
+| .dockerignore frontend | ✅ | 2025-11-08 | Optimisation du contexte de build |
+| docker-compose.yml | ✅ | 2025-11-08 | PostgreSQL, backend, frontend, pgAdmin, networks, volumes |
+| docker-compose.dev.yml | ✅ | 2025-11-08 | Development mode avec hot reload, MailHog, Redis |
+| nginx.conf | ✅ | 2025-11-08 | Configuration Nginx avec gzip, security headers |
+| nginx-default.conf | ✅ | 2025-11-08 | Reverse proxy vers backend, Angular routing |
+
+### Scripts et Automatisation
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| deploy-docker.sh | ✅ | 2025-11-08 | Script de déploiement avec validation env dev/prod |
+| Makefile | ✅ | 2025-11-08 | 25+ commandes: build, deploy, logs, backup, health |
+| .env.example | ✅ | 2025-11-08 | Template configuration avec guidelines sécurité |
+
+### CI/CD
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| GitHub Actions workflow | ✅ | 2025-11-08 | Tests backend/frontend, Docker build, security scan, deploy |
+| Backend tests job | ✅ | 2025-11-08 | Maven tests + coverage (Codecov) |
+| Frontend tests job | ✅ | 2025-11-08 | npm tests + lint + coverage |
+| Docker build job | ✅ | 2025-11-08 | Multi-platform build, push to Docker Hub |
+| Security scan job | ✅ | 2025-11-08 | Trivy vulnerability scanner |
+| Deploy production job | ✅ | 2025-11-08 | SSH deployment + Slack notifications |
+
+### Kubernetes
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| deployment.yaml | ✅ | 2025-11-08 | Manifests complets K8s |
+| PostgreSQL StatefulSet | ✅ | 2025-11-08 | Persistent volume, health checks |
+| Backend Deployment | ✅ | 2025-11-08 | 2 replicas, health checks, resources |
+| Frontend Deployment | ✅ | 2025-11-08 | 2 replicas, health checks |
+| Services | ✅ | 2025-11-08 | ClusterIP backend, LoadBalancer frontend |
+| Ingress | ✅ | 2025-11-08 | TLS/SSL, cert-manager, routing |
+| HorizontalPodAutoscaler | ✅ | 2025-11-08 | Backend auto-scaling 2-10 pods |
+| Secrets | ✅ | 2025-11-08 | Database + JWT secrets |
+| Kubernetes README | ✅ | 2025-11-08 | Deployment guide, scaling, monitoring |
+
+### Documentation
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| DEPLOYMENT.md | ✅ | 2025-11-08 | Guide complet de déploiement |
+| Quick Start section | ✅ | 2025-11-08 | 5 étapes pour démarrer |
+| Configuration guide | ✅ | 2025-11-08 | Variables env, sécurité |
+| Production setup | ✅ | 2025-11-08 | Server prep, SSL, systemd |
+| Cloud platforms | ✅ | 2025-11-08 | AWS, GCP, Azure guides |
+| Monitoring section | ✅ | 2025-11-08 | Health checks, logs, backups |
+| Troubleshooting | ✅ | 2025-11-08 | Solutions problèmes courants |
+
+### Décisions techniques
+- **Docker:** Multi-stage builds pour optimisation taille images
+- **Security:** Non-root users, minimal base images (Alpine)
+- **Health Checks:** Tous les services avec healthcheck
+- **Orchestration:** Docker Compose pour dev, Kubernetes pour prod
+- **CI/CD:** GitHub Actions avec tests, build, scan, deploy
+- **Monitoring:** Actuator endpoints, container stats
+- **Backups:** Automated database backups avec cron
+- **Scaling:** HPA pour backend (CPU 70%, Memory 80%)
+- **TLS:** cert-manager pour certificats automatiques
+- **Logs:** Centralized logging ready (ELK stack compatible)
+
+---
+
 ## 📝 Notes et Décisions Importantes
 
 ### 2025-11-07

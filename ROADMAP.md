@@ -478,40 +478,59 @@
 ---
 
 ## 🔌 Phase 9 - API et Intégrations
-**Statut:** ⏳ Planifié
-**Début estimé:** Après Phase 8
-**Fin estimée:** -
+**Statut:** ✅ Terminé (Core) - UI à venir
+**Début:** 2025-11-08
+**Fin:** 2025-11-08
 
 ### Tâches Backend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Versioning API (v1, v2) | ⏳ | - | URL /api/v1/... |
-| Documentation OpenAPI 3.0 complète | ⏳ | - | Swagger UI |
-| Rate limiting | ⏳ | - | Bucket4j, 100 req/min par IP |
-| Entity ApiKey | ⏳ | - | Clés API pour intégrations |
-| Service ApiKeyService | ⏳ | - | Génération, révocation |
-| Entity Webhook | ⏳ | - | Webhooks sortants |
-| Service WebhookService | ⏳ | - | Déclenchement événements |
-| Controller ApiKeyController | ⏳ | - | Gestion API keys |
-| Controller WebhookController | ⏳ | - | Config webhooks |
-| Authentication API key (header X-API-Key) | ⏳ | - | Alternative à JWT |
-| Événements webhook (process.started, task.completed, etc.) | ⏳ | - | Pub/Sub pattern |
-| Retry webhooks en cas d'échec | ⏳ | - | Exponential backoff |
-| Tests API avec RestAssured | ⏳ | - | Tests intégration |
+| Entity ApiKey | ✅ | 2025-11-08 | SHA-256 hashing, permissions, rate limiting, IP whitelist, expiration |
+| Entity Webhook | ✅ | 2025-11-08 | Event subscriptions, HMAC signatures, retry logic, delivery tracking |
+| Entity WebhookDelivery | ✅ | 2025-11-08 | Audit trail (request/response, status, retry count, duration) |
+| Repository ApiKeyRepository | ✅ | 2025-11-08 | 12 query methods (find by hash, active keys, expired keys, search) |
+| Repository WebhookRepository | ✅ | 2025-11-08 | 10 query methods (find by event, enabled, search, with failures) |
+| Repository WebhookDeliveryRepository | ✅ | 2025-11-08 | 9 query methods (by webhook, by status, pending retries, cleanup) |
+| Service ApiKeyService | ✅ | 2025-11-08 | CRUD, secure key generation, SHA-256 hashing, authentication |
+| Service WebhookService | ✅ | 2025-11-08 | CRUD, async delivery, retry logic, HMAC signatures, test webhook |
+| DTOs (10) | ✅ | 2025-11-08 | ApiKeyDTO, CreateApiKeyDTO, ApiKeyCreatedDTO, WebhookDTO, CreateWebhookDTO, UpdateWebhookDTO, WebhookDeliveryDTO + 3 more |
+| Mappers (2) | ✅ | 2025-11-08 | ApiKeyMapper, WebhookMapper (MapStruct) |
+| ApiKeyAuthenticationFilter | ✅ | 2025-11-08 | Spring Security filter for X-API-Key header authentication |
+| Controller ApiKeyController | ✅ | 2025-11-08 | 11 REST endpoints (CRUD, enable/disable, search, stats) |
+| Controller WebhookController | ✅ | 2025-11-08 | 15 REST endpoints (CRUD, enable/disable, test, delivery history, stats) |
+| Authentication API key (header X-API-Key) | ✅ | 2025-11-08 | Alternative authentication to JWT |
+| Retry webhooks en cas d'échec | ✅ | 2025-11-08 | Exponential backoff (delay * 2^attempt) |
+| i18n messages FR/EN | ✅ | 2025-11-08 | 20 messages (apikey.*, webhook.*) |
+| Versioning API (v1) | ✅ | Existant | URL /api/v1/... déjà en place |
+| Documentation OpenAPI 3.0 complète | ✅ | Existant | Swagger UI déjà configuré |
+| Événements webhook (process.*, task.*, form.*) | ✅ | 2025-11-08 | Event-driven architecture, async triggering |
+| Rate limiting | ⏳ | - | Bucket4j à implémenter (futur) |
+| Tests API avec RestAssured | ⏳ | - | À implémenter (futur) |
 
 ### Tâches Frontend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Page gestion API keys | ⏳ | - | Génération, liste, révocation |
-| Page configuration webhooks | ⏳ | - | URL, événements, secrets |
-| Page documentation API | ⏳ | - | Swagger UI embedded |
-| Logs webhooks | ⏳ | - | Historique calls |
+| Models TypeScript (10) | ✅ | 2025-11-08 | ApiKey, ApiKeyCreated, CreateApiKeyRequest, UpdateApiKeyRequest, Webhook, CreateWebhookRequest, UpdateWebhookRequest, WebhookDelivery |
+| Service ApiKeyService | ✅ | 2025-11-08 | 10 méthodes API (CRUD, enable/disable, search, stats) |
+| Service WebhookService | ✅ | 2025-11-08 | 11 méthodes API (CRUD, enable/disable, test, delivery history, stats) |
+| Page gestion API keys | ⏳ | - | À implémenter (futur) |
+| Page configuration webhooks | ⏳ | - | À implémenter (futur) |
+| Page documentation API | ⏳ | - | À implémenter (futur) |
+| Logs webhooks | ⏳ | - | À implémenter (futur) |
 
 ### Décisions techniques
-- **Versioning:** URI versioning (/api/v1, /api/v2)
-- **Rate limiting:** Bucket4j avec Redis (prod) ou in-memory (dev)
-- **API keys:** UUID v4, hash SHA-256 en BD
-- **Webhooks:** HTTP POST JSON, signature HMAC-SHA256
+- **API Keys:** SecureRandom + Base64 (32 bytes), SHA-256 hashing, never store plain text
+- **Authentication:** X-API-Key header, Spring Security filter integration
+- **Permissions:** Granular permission sets per API key, converted to Spring Security authorities
+- **Rate Limiting:** Configurable per API key (requests/minute), future Bucket4j integration
+- **IP Whitelisting:** Comma-separated IP addresses per key
+- **Webhook Events:** Event-driven architecture with async delivery
+- **Retry Logic:** Exponential backoff (delay * 2^attempt), configurable max retries
+- **HMAC Signatures:** HMAC-SHA256 for webhook payload verification
+- **Delivery Tracking:** Complete audit trail (request, response, duration, retries)
+- **Versioning:** URI versioning (/api/v1/...) already in place
+- **Security:** All endpoints protected with RBAC (API_KEY_*, WEBHOOK_* permissions)
+- **Soft Delete:** Auditability for all entities
 
 ---
 

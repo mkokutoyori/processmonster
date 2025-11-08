@@ -95,9 +95,9 @@
 | Dashboard basique | ✅ | 2025-11-07 | KPIs placeholder + actions rapides |
 | Gestion erreurs auth | ✅ | 2025-11-07 | Messages i18n avec toastr |
 | Sélecteur langue | ✅ | 2025-11-07 | FR/EN dans page login |
-| Page register (FR/EN) | ⏳ | - | À implémenter Phase 3 |
-| Page forgot password | ⏳ | - | À implémenter Phase 3 |
-| Page change password | ⏳ | - | À implémenter Phase 3 |
+| Page register (FR/EN) | ✅ | 2025-11-08 | Reactive forms + validation + Material Design |
+| Page forgot password | ✅ | 2025-11-08 | Email submission + success state |
+| Page change password | ✅ | 2025-11-08 | Password requirements validation |
 
 ### Décisions techniques
 - **JWT secret:** Variable d'environnement configurée dans application.yml
@@ -152,10 +152,10 @@
 | Actions (activate/deactivate/delete) | ✅ | 2025-11-07 | Boutons action dans table |
 | Toast notifications | ✅ | 2025-11-07 | ngx-toastr pour success/error |
 | Routes lazy loading | ✅ | 2025-11-07 | /users → UserListComponent |
-| Page détail utilisateur | ⏳ | - | À implémenter (optionnel) |
-| Page création utilisateur | ⏳ | - | À implémenter Phase suivante |
-| Page édition utilisateur | ⏳ | - | À implémenter Phase suivante |
-| Gestion rôles (chips) | ⏳ | - | Multi-sélection |
+| Page détail utilisateur | ✅ | 2025-11-08 | Read-only view with roles, stats, status |
+| Page création utilisateur | ✅ | 2025-11-08 | Form grid + multi-role selection + password field |
+| Page édition utilisateur | ✅ | 2025-11-08 | Pre-populated form + status toggle + delete |
+| Gestion rôles (chips) | ✅ | 2025-11-08 | Multi-sélection mat-select + mat-chip display |
 | i18n labels/messages FR/EN | ⏳ | - | Tout traduire |
 
 ### Décisions techniques
@@ -207,9 +207,10 @@
 | Service ProcessDefinitionService | ✅ | 2025-11-07 | 13 méthodes API + download |
 | Composant ProcessList | ✅ | 2025-11-07 | Material Table, pagination, search, filters |
 | Routes processes | ✅ | 2025-11-07 | Lazy loading configuration |
+| Page création processus | ✅ | 2025-11-08 | Multi-step wizard (blank/template/import) |
 | Composant BpmnEditor | ⏳ | - | À implémenter Phase suivante |
 | Page éditeur processus | ⏳ | - | bpmn-js + toolbar |
-| Modal import BPMN | ⏳ | - | Upload XML |
+| Modal import BPMN | ✅ | 2025-11-08 | File upload in creation wizard |
 | Palette BPMN personnalisée | ⏳ | - | Éléments bancaires |
 | Validation visuelle | ⏳ | - | Erreurs en temps réel |
 
@@ -456,14 +457,14 @@
 |-------|--------|------|-------|
 | Models TypeScript (6) | ✅ | 2025-11-07 | SystemKPIs, StatusStats, UserTaskStats, ProcessDefinitionStats, DailyCompletionTrend |
 | Service DashboardService | ✅ | 2025-11-07 | 7 méthodes API complètes |
-| Page dashboard principal | ⏳ | - | À implémenter Phase future |
-| Composants KPI cards | ⏳ | - | À implémenter Phase future |
-| Graphiques Chart.js (line, bar, pie, doughnut) | ⏳ | - | À implémenter Phase future |
-| Filtres période (jour, semaine, mois, année, custom) | ⏳ | - | À implémenter Phase future |
-| Page rapports | ⏳ | - | À implémenter Phase future |
+| Page dashboard principal | ✅ | 2025-11-08 | 4 KPI cards + Recent Activity table + Quick Actions |
+| Composants KPI cards | ✅ | 2025-11-08 | Processes, Instances, Tasks, Users metrics |
+| Graphiques Chart.js (line, bar, pie, doughnut) | ⏳ | - | À intégrer (placeholder créé) |
+| Filtres période (jour, semaine, mois, année, custom) | ✅ | 2025-11-08 | Dans page rapports |
+| Page rapports | ✅ | 2025-11-08 | Tabs: Summary, Process Performance, User Activity, SLA |
 | Modal configuration rapport | ⏳ | - | À implémenter Phase future |
-| Download PDF/Excel | ⏳ | - | À implémenter Phase future |
-| Refresh automatique dashboard | ⏳ | - | À implémenter Phase future |
+| Download PDF/Excel | ⏳ | - | Placeholder créé, intégration à venir |
+| Refresh automatique dashboard | ✅ | 2025-11-08 | Bouton refresh + auto-reload on init |
 
 ### Décisions techniques
 - **Metrics:** MetricsService avec 7 méthodes (getSystemKPIs, getProcessStatsByStatus, getTaskStatsByStatus, getTaskStatsByPriority, getUserTaskStats, getDailyTaskCompletionTrend, getProcessDefinitionStats)

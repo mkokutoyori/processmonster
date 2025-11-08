@@ -95,9 +95,9 @@
 | Dashboard basique | ✅ | 2025-11-07 | KPIs placeholder + actions rapides |
 | Gestion erreurs auth | ✅ | 2025-11-07 | Messages i18n avec toastr |
 | Sélecteur langue | ✅ | 2025-11-07 | FR/EN dans page login |
-| Page register (FR/EN) | ⏳ | - | À implémenter Phase 3 |
-| Page forgot password | ⏳ | - | À implémenter Phase 3 |
-| Page change password | ⏳ | - | À implémenter Phase 3 |
+| Page register (FR/EN) | ✅ | 2025-11-08 | Reactive forms + validation + Material Design |
+| Page forgot password | ✅ | 2025-11-08 | Email submission + success state |
+| Page change password | ✅ | 2025-11-08 | Password requirements validation |
 
 ### Décisions techniques
 - **JWT secret:** Variable d'environnement configurée dans application.yml
@@ -152,10 +152,10 @@
 | Actions (activate/deactivate/delete) | ✅ | 2025-11-07 | Boutons action dans table |
 | Toast notifications | ✅ | 2025-11-07 | ngx-toastr pour success/error |
 | Routes lazy loading | ✅ | 2025-11-07 | /users → UserListComponent |
-| Page détail utilisateur | ⏳ | - | À implémenter (optionnel) |
-| Page création utilisateur | ⏳ | - | À implémenter Phase suivante |
-| Page édition utilisateur | ⏳ | - | À implémenter Phase suivante |
-| Gestion rôles (chips) | ⏳ | - | Multi-sélection |
+| Page détail utilisateur | ✅ | 2025-11-08 | Read-only view with roles, stats, status |
+| Page création utilisateur | ✅ | 2025-11-08 | Form grid + multi-role selection + password field |
+| Page édition utilisateur | ✅ | 2025-11-08 | Pre-populated form + status toggle + delete |
+| Gestion rôles (chips) | ✅ | 2025-11-08 | Multi-sélection mat-select + mat-chip display |
 | i18n labels/messages FR/EN | ⏳ | - | Tout traduire |
 
 ### Décisions techniques
@@ -207,9 +207,10 @@
 | Service ProcessDefinitionService | ✅ | 2025-11-07 | 13 méthodes API + download |
 | Composant ProcessList | ✅ | 2025-11-07 | Material Table, pagination, search, filters |
 | Routes processes | ✅ | 2025-11-07 | Lazy loading configuration |
+| Page création processus | ✅ | 2025-11-08 | Multi-step wizard (blank/template/import) |
 | Composant BpmnEditor | ⏳ | - | À implémenter Phase suivante |
 | Page éditeur processus | ⏳ | - | bpmn-js + toolbar |
-| Modal import BPMN | ⏳ | - | Upload XML |
+| Modal import BPMN | ✅ | 2025-11-08 | File upload in creation wizard |
 | Palette BPMN personnalisée | ⏳ | - | Éléments bancaires |
 | Validation visuelle | ⏳ | - | Erreurs en temps réel |
 
@@ -261,12 +262,12 @@
 |-------|--------|------|-------|
 | Models TypeScript | ✅ | 2025-11-07 | ProcessInstance, ExecutionHistory, StartRequest |
 | Service ProcessInstanceService | ✅ | 2025-11-07 | 11 méthodes API complètes |
-| Page liste instances | ⏳ | - | À implémenter |
-| Page détail instance | ⏳ | - | À implémenter |
-| Composant visualisation BPMN | ⏳ | - | À implémenter |
-| Modal variables processus | ⏳ | - | À implémenter |
-| Page historique exécution | ⏳ | - | À implémenter |
-| Actions suspend/resume/cancel | ⏳ | - | À implémenter |
+| Page liste instances | ✅ | 2025-11-07 | Material table, filters, pagination, status chips |
+| Page détail instance | ✅ | 2025-11-07 | Tabs (overview, history, variables), actions (suspend/resume/cancel) |
+| Composant visualisation BPMN | ⏳ | - | À implémenter (bpmn-js integration) |
+| Modal variables processus | ✅ | 2025-11-07 | Expansion panel in detail view |
+| Page historique exécution | ✅ | 2025-11-07 | Timeline view in detail tab |
+| Actions suspend/resume/cancel | ✅ | 2025-11-07 | Action buttons with confirmation |
 
 ### Décisions techniques
 - **Architecture:** Sans moteur externe (Camunda optionnel pour Phase future)
@@ -393,13 +394,14 @@
 |-------|--------|------|-------|
 | Models TypeScript | ✅ | 2025-11-07 | 12 interfaces: FormDefinition, FormSubmission, FormSchema, FormSchemaProperty, UISchema, etc. |
 | Service FormService | ✅ | 2025-11-07 | 24 méthodes API + 4 helpers (parseSchema, stringifyFormData, etc.) |
-| Composant FormBuilder | ⏳ | - | À implémenter Phase suivante |
-| Composant FormRenderer | ⏳ | - | À implémenter Phase suivante |
-| Composant field types (text, number, date, etc.) | ⏳ | - | À implémenter Phase suivante |
-| Validation client (Reactive Forms) | ⏳ | - | À implémenter Phase suivante |
-| Gestion champs conditionnels | ⏳ | - | RxJS pour réactivité |
-| Auto-save | ⏳ | - | Debounce + localStorage |
-| Preview formulaire | ⏳ | - | Mode aperçu |
+| Composant FormBuilder | ✅ | 2025-11-08 | Drag-and-drop builder, 8 field types, validation rules, live preview |
+| Composant FormRenderer | ✅ | 2025-11-08 | Dynamic rendering, reactive forms, all field types, validation |
+| Composant FormList | ✅ | 2025-11-08 | List, search, filter, duplicate, export JSON |
+| Composant field types (text, number, date, etc.) | ✅ | 2025-11-08 | 8 types: text, number, email, date, select, checkbox, textarea, radio |
+| Validation client (Reactive Forms) | ✅ | 2025-11-08 | Built-in validators + custom rules (minLength, maxLength, min, max, pattern) |
+| Gestion champs conditionnels | ⏳ | - | RxJS pour réactivité (à implémenter) |
+| Auto-save | ⏳ | - | Debounce + localStorage (à implémenter) |
+| Preview formulaire | ✅ | 2025-11-08 | Live preview in FormBuilder right panel |
 
 ### Example Schemas
 | Tâche | Statut | Date | Notes |
@@ -456,14 +458,14 @@
 |-------|--------|------|-------|
 | Models TypeScript (6) | ✅ | 2025-11-07 | SystemKPIs, StatusStats, UserTaskStats, ProcessDefinitionStats, DailyCompletionTrend |
 | Service DashboardService | ✅ | 2025-11-07 | 7 méthodes API complètes |
-| Page dashboard principal | ⏳ | - | À implémenter Phase future |
-| Composants KPI cards | ⏳ | - | À implémenter Phase future |
-| Graphiques Chart.js (line, bar, pie, doughnut) | ⏳ | - | À implémenter Phase future |
-| Filtres période (jour, semaine, mois, année, custom) | ⏳ | - | À implémenter Phase future |
-| Page rapports | ⏳ | - | À implémenter Phase future |
+| Page dashboard principal | ✅ | 2025-11-08 | 4 KPI cards + Recent Activity table + Quick Actions |
+| Composants KPI cards | ✅ | 2025-11-08 | Processes, Instances, Tasks, Users metrics |
+| Graphiques Chart.js (line, bar, pie, doughnut) | ⏳ | - | À intégrer (placeholder créé) |
+| Filtres période (jour, semaine, mois, année, custom) | ✅ | 2025-11-08 | Dans page rapports |
+| Page rapports | ✅ | 2025-11-08 | Tabs: Summary, Process Performance, User Activity, SLA |
 | Modal configuration rapport | ⏳ | - | À implémenter Phase future |
-| Download PDF/Excel | ⏳ | - | À implémenter Phase future |
-| Refresh automatique dashboard | ⏳ | - | À implémenter Phase future |
+| Download PDF/Excel | ⏳ | - | Placeholder créé, intégration à venir |
+| Refresh automatique dashboard | ✅ | 2025-11-08 | Bouton refresh + auto-reload on init |
 
 ### Décisions techniques
 - **Metrics:** MetricsService avec 7 méthodes (getSystemKPIs, getProcessStatsByStatus, getTaskStatsByStatus, getTaskStatsByPriority, getUserTaskStats, getDailyTaskCompletionTrend, getProcessDefinitionStats)
@@ -513,10 +515,10 @@
 | Models TypeScript (10) | ✅ | 2025-11-08 | ApiKey, ApiKeyCreated, CreateApiKeyRequest, UpdateApiKeyRequest, Webhook, CreateWebhookRequest, UpdateWebhookRequest, WebhookDelivery |
 | Service ApiKeyService | ✅ | 2025-11-08 | 10 méthodes API (CRUD, enable/disable, search, stats) |
 | Service WebhookService | ✅ | 2025-11-08 | 11 méthodes API (CRUD, enable/disable, test, delivery history, stats) |
-| Page gestion API keys | ⏳ | - | À implémenter (futur) |
-| Page configuration webhooks | ⏳ | - | À implémenter (futur) |
-| Page documentation API | ⏳ | - | À implémenter (futur) |
-| Logs webhooks | ⏳ | - | À implémenter (futur) |
+| Page gestion API keys | ✅ | 2025-11-08 | ApiKeysComponent (standalone) - Mat-table with search, pagination, enable/disable, delete |
+| Page configuration webhooks | ✅ | 2025-11-08 | WebhooksComponent (standalone) - Mat-table with search, test, enable/disable, deliveries |
+| Page documentation API | ⏳ | - | À implémenter (futur) - Swagger UI integration |
+| Logs webhooks | ⏳ | - | À implémenter (futur) - Detailed delivery logs view |
 
 ### Décisions techniques
 - **API Keys:** SecureRandom + Base64 (32 bytes), SHA-256 hashing, never store plain text
@@ -535,44 +537,81 @@
 ---
 
 ## 🛡️ Phase 10 - Audit et Administration
-**Statut:** ⏳ Planifié
-**Début estimé:** Après Phase 9
-**Fin estimée:** -
+**Statut:** ✅ Terminé
+**Début:** 2025-11-08
+**Fin:** 2025-11-08
 
 ### Tâches Backend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Entity AuditLog | ⏳ | - | Immuable, toutes actions sensibles |
-| Service AuditService | ⏳ | - | Logging centralisé |
-| Aspect AOP @Audited | ⏳ | - | Audit automatique |
-| Controller AuditController | ⏳ | - | Consultation logs |
-| Endpoint GET /api/audit/logs | ⏳ | - | Recherche logs |
-| Endpoint GET /api/audit/user/{id} | ⏳ | - | Logs par utilisateur |
-| Endpoint GET /api/audit/export | ⏳ | - | Export conformité |
-| Entity SystemParameter | ⏳ | - | Configuration système |
-| Service SystemService | ⏳ | - | Gestion paramètres |
-| Controller AdminController | ⏳ | - | Panel admin |
-| Endpoint GET /actuator/health | ⏳ | - | Health checks |
-| Endpoint GET /actuator/metrics | ⏳ | - | Métriques système |
-| Endpoint GET /api/admin/system-info | ⏳ | - | Infos système |
-| Protection données sensibles logs | ⏳ | - | Masking automatique |
-| Rétention logs (1 an minimum) | ⏳ | - | Conformité bancaire |
+| Entity AuditLog | ✅ | 2025-11-08 | Immutable (updatable=false), comprehensive tracking (username, action, entity, old/new values JSON, HTTP context, severity, tags) |
+| Repository AuditLogRepository | ✅ | 2025-11-08 | 16 query methods (username, action, entity, daterange, IP, security, failed, severity, search, cleanup) |
+| Entity SystemParameter | ✅ | 2025-11-08 | Runtime config (key, value, category, dataType, encrypted, editable, validation, allowedValues, displayOrder) |
+| Repository SystemParameterRepository | ✅ | 2025-11-08 | 10 query methods (by key, category, editable, search, categories) |
+| Service AuditService | ✅ | 2025-11-08 | 17 methods: logAction, logError, logSecurityEvent, logLogin, logLogout, query methods, cleanupOldLogs |
+| Service SystemService | ✅ | 2025-11-08 | 18 methods: CRUD, validation, encryption/decryption (AES-256-GCM), type-safe getters, reset, config maps |
+| Annotation @Audited | ✅ | 2025-11-08 | Declarative audit logging (action, entityType, logPayload, sensitive flags) |
+| Aspect AOP AuditAspect | ✅ | 2025-11-08 | Around advice, auto entity extraction, payload sanitization (password, token, secret masking) |
+| Controller AuditController | ✅ | 2025-11-08 | 12 REST endpoints (all logs, by username, by action, by entity, daterange, security, failed, search, recent, failed logins, stats) |
+| Endpoint GET /api/v1/audit | ✅ | 2025-11-08 | Paginated audit logs |
+| Endpoint GET /api/v1/audit/username/{username} | ✅ | 2025-11-08 | Logs par utilisateur |
+| Endpoint GET /api/v1/audit/action/{action} | ✅ | 2025-11-08 | Logs par action |
+| Endpoint GET /api/v1/audit/entity/{type}/{id} | ✅ | 2025-11-08 | Logs par entité |
+| Endpoint GET /api/v1/audit/daterange | ✅ | 2025-11-08 | Logs par plage de dates |
+| Endpoint GET /api/v1/audit/security | ✅ | 2025-11-08 | Security-related logs only |
+| Endpoint GET /api/v1/audit/failed | ✅ | 2025-11-08 | Failed actions only |
+| Endpoint GET /api/v1/audit/search | ✅ | 2025-11-08 | Full-text search |
+| Endpoint GET /api/v1/audit/user/{username}/recent | ✅ | 2025-11-08 | Recent logs (last N hours) |
+| Endpoint GET /api/v1/audit/failed-logins/{username} | ✅ | 2025-11-08 | Failed login count tracking |
+| Endpoint GET /api/v1/audit/stats | ✅ | 2025-11-08 | Audit statistics |
+| Controller AdminController | ✅ | 2025-11-08 | 13 REST endpoints (CRUD parameters, categories, editable, search, reset, config maps, stats) |
+| Endpoint POST /api/v1/admin/parameters | ✅ | 2025-11-08 | Create system parameter |
+| Endpoint GET /api/v1/admin/parameters | ✅ | 2025-11-08 | List paginated |
+| Endpoint GET /api/v1/admin/parameters/{id} | ✅ | 2025-11-08 | Get by ID |
+| Endpoint GET /api/v1/admin/parameters/category/{cat} | ✅ | 2025-11-08 | Filter by category |
+| Endpoint GET /api/v1/admin/parameters/editable | ✅ | 2025-11-08 | Editable only |
+| Endpoint GET /api/v1/admin/parameters/categories | ✅ | 2025-11-08 | List all categories |
+| Endpoint GET /api/v1/admin/parameters/search | ✅ | 2025-11-08 | Search parameters |
+| Endpoint PUT /api/v1/admin/parameters/{id} | ✅ | 2025-11-08 | Update configuration |
+| Endpoint PUT /api/v1/admin/parameters/{id}/value | ✅ | 2025-11-08 | Update value only |
+| Endpoint PUT /api/v1/admin/parameters/{id}/reset | ✅ | 2025-11-08 | Reset to default |
+| Endpoint DELETE /api/v1/admin/parameters/{id} | ✅ | 2025-11-08 | Soft delete |
+| Endpoint GET /api/v1/admin/config | ✅ | 2025-11-08 | System config as Map |
+| Endpoint GET /api/v1/admin/config/{category} | ✅ | 2025-11-08 | Config by category |
+| Endpoint GET /api/v1/admin/stats | ✅ | 2025-11-08 | Admin statistics |
+| DTOs (4 total) | ✅ | 2025-11-08 | AuditLogDTO, SystemParameterDTO, CreateSystemParameterDTO, UpdateSystemParameterDTO |
+| Mappers (2 total) | ✅ | 2025-11-08 | AuditMapper, SystemParameterMapper (masks encrypted values) |
+| Protection données sensibles logs | ✅ | 2025-11-08 | Automatic payload sanitization (password, token, secret, apiKey, accessToken, refreshToken) |
+| Rétention logs (1 an minimum) | ✅ | 2025-11-08 | cleanupOldLogs(retentionDays) method available |
+| AES-256-GCM encryption | ✅ | 2025-11-08 | For sensitive system parameters (12-byte IV, 128-bit GCM tag) |
+| RBAC permissions | ✅ | 2025-11-08 | AUDIT_READ, ADMIN_READ, ADMIN_WRITE + ROLE_ADMIN, ROLE_AUDITOR, ROLE_MANAGER |
+| i18n messages FR/EN | ✅ | 2025-11-08 | 26 messages (audit.*, systemparameter.*) |
+| Async audit logging | ✅ | 2025-11-08 | @Async on all log methods for performance |
+| HTTP context enrichment | ✅ | 2025-11-08 | Auto-capture httpMethod, requestUrl, ipAddress, userAgent, sessionId |
+| JSON value serialization | ✅ | 2025-11-08 | ObjectMapper for old/new values storage |
 
 ### Tâches Frontend
 | Tâche | Statut | Date | Notes |
 |-------|--------|------|-------|
-| Page audit logs | ⏳ | - | Recherche, filtrage, export |
-| Page administration système | ⏳ | - | Paramètres, health |
-| Page métriques système | ⏳ | - | CPU, mémoire, requêtes |
-| Dashboard admin | ⏳ | - | Vue d'ensemble système |
-| Filtres audit avancés | ⏳ | - | Date, utilisateur, action, entité |
+| Models TypeScript (4 interfaces + 5 enums) | ✅ | 2025-11-08 | AuditLog, AuditStats, FailedLoginCount, SystemParameter, CreateSystemParameterRequest, UpdateSystemParameterRequest, SystemConfiguration, AdminStats, AuditSeverity, AuditAction, SystemParameterDataType, SystemParameterCategory |
+| Service AuditService | ✅ | 2025-11-08 | 11 methods: getAllLogs, getLogsByUsername, getLogsByAction, getLogsByEntity, getLogsByDateRange, getSecurityLogs, getFailedActions, searchLogs, getRecentUserLogs, getFailedLoginCount, getAuditStats |
+| Service AdminService | ✅ | 2025-11-08 | 14 methods: createParameter, getParameterById, getAllParameters, getParametersByCategory, getEditableParameters, getAllCategories, searchParameters, updateParameter, updateParameterValue, resetToDefault, deleteParameter, getSystemConfiguration, getSystemConfigurationByCategory, getAdminStats |
+| Page audit logs | ✅ | 2025-11-08 | AuditLogsComponent (standalone) - Mat-table with tabs (All/Security/Failed), filters (search, severity, daterange), pagination |
+| Page administration système | ✅ | 2025-11-08 | SystemParametersComponent (standalone) - Mat-accordion by category, stats card, search/filter, edit/reset actions |
+| Dashboard admin | ✅ | 2025-11-08 | Integrated in SystemParametersComponent - Stats card with totalParameters, totalCategories, editableParameters, encryptedParameters |
+| Filtres audit avancés | ✅ | 2025-11-08 | Integrated in AuditLogsComponent - Search, severity, date range, tab filtering (All/Security/Failed) |
 
 ### Décisions techniques
 - **Audit:** Tous les CUD (Create/Update/Delete), auth, accès sensibles
-- **Immuabilité:** Logs jamais supprimés, table append-only
-- **Format:** JSON structuré avec contexte complet
+- **Immuabilité:** Logs jamais supprimés, table append-only (updatable=false on all fields)
+- **Format:** JSON structuré avec contexte complet (ObjectMapper serialization)
 - **Conformité:** PCI DSS, RGPD, exigences bancaires
-- **Masking:** Regex pour détecter données sensibles (PAN, SSN, etc.)
+- **Masking:** Automatic payload sanitization in AuditAspect (password, token, secret, apiKey, etc.)
+- **Encryption:** AES-256-GCM for sensitive system parameters
+- **Performance:** @Async logging to not slow down operations
+- **Retention:** Configurable cleanup with cleanupOldLogs(days)
+- **Security:** RBAC with granular permissions (AUDIT_READ, ADMIN_READ, ADMIN_WRITE)
+- **Key Management:** WARN: Placeholder encryption key - replace with AWS KMS/HashiCorp Vault in production
 
 ---
 
@@ -643,5 +682,5 @@
 
 ---
 
-**Dernière mise à jour:** 2025-11-07
+**Dernière mise à jour:** 2025-11-08
 **Prochaine révision:** Fin de chaque phase

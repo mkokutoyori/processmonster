@@ -108,6 +108,18 @@ public class Task {
     private String formKey;
 
     /**
+     * Camunda task ID for synchronization
+     */
+    @Column(length = 100, unique = true)
+    private String camundaTaskId;
+
+    /**
+     * Process instance ID from Camunda
+     */
+    @Column(length = 100)
+    private String processInstanceId;
+
+    /**
      * Completion date
      */
     private LocalDateTime completedDate;

@@ -12,6 +12,11 @@ import com.processmonster.bpm.repository.ProcessDefinitionRepository;
 import com.processmonster.bpm.repository.ProcessInstanceRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessDefinition as CamundaProcessDefinition;
+import org.camunda.bpm.engine.runtime.ProcessInstance as CamundaProcessInstance;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -21,12 +26,15 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Service for executing and managing process instances
+ * Now integrated with Camunda BPM Engine for actual process execution
  */
 @Service
 @Slf4j
@@ -40,8 +48,13 @@ public class ProcessExecutionService {
     private final VariableService variableService;
     private final MessageSource messageSource;
 
+    // Camunda services
+    private final RuntimeService camundaRuntimeService;
+    private final RepositoryService camundaRepositoryService;
+
     /**
      * Start a new process instance
+     * Now deploys BPMN to Camunda and starts actual process execution
      */
     @Transactional
     public ProcessInstance startProcess(Long processDefinitionId, String businessKey, Map<String, Object> variables) {
@@ -57,33 +70,116 @@ public class ProcessExecutionService {
             throw new BusinessException(getMessage("instance.start.not-active"));
         }
 
-        // Create process instance
-        ProcessInstance instance = ProcessInstance.builder()
-                .processDefinition(definition)
-                .businessKey(businessKey)
-                .status(ProcessInstanceStatus.RUNNING)
-                .startTime(LocalDateTime.now())
-                .startedBy(getCurrentUsername())
-                .build();
+        try {
+            // Deploy BPMN to Camunda if not already deployed
+            String camundaProcessDefinitionId = deployProcessToCamunda(definition);
 
-        ProcessInstance saved = instanceRepository.save(instance);
+            // Prepare variables for Camunda (include initiator info)
+            Map<String, Object> camundaVariables = new HashMap<>();
+            if (variables != null) {
+                camundaVariables.putAll(variables);
+            }
+            // Add system variables
+            camundaVariables.put("initiatorId", getCurrentUserId());
+            camundaVariables.put("initiatorUsername", getCurrentUsername());
 
-        // Set initial variables
-        if (variables != null && !variables.isEmpty()) {
-            variableService.setVariables(saved.getId(), variables);
+            // Start process instance in Camunda
+            CamundaProcessInstance camundaInstance = camundaRuntimeService
+                    .startProcessInstanceByKey(
+                            definition.getProcessKey(),
+                            businessKey,
+                            camundaVariables
+                    );
+
+            log.info("Camunda process instance started: {}", camundaInstance.getProcessInstanceId());
+
+            // Create process instance in our database
+            ProcessInstance instance = ProcessInstance.builder()
+                    .processDefinition(definition)
+                    .businessKey(businessKey)
+                    .status(ProcessInstanceStatus.RUNNING)
+                    .startTime(LocalDateTime.now())
+                    .startedBy(getCurrentUsername())
+                    .engineInstanceId(camundaInstance.getProcessInstanceId())
+                    .build();
+
+            ProcessInstance saved = instanceRepository.save(instance);
+
+            // Set initial variables in our system
+            if (variables != null && !variables.isEmpty()) {
+                variableService.setVariables(saved.getId(), variables);
+            }
+
+            // Record history event
+            recordHistory(saved, EventType.PROCESS_STARTED,
+                "Process started in Camunda - Instance ID: " + camundaInstance.getProcessInstanceId());
+
+            log.info("Started process instance {} for definition {} (key: {}), Camunda ID: {}",
+                     saved.getId(), definition.getId(), definition.getProcessKey(),
+                     camundaInstance.getProcessInstanceId());
+
+            return saved;
+
+        } catch (Exception e) {
+            log.error("Error starting process instance", e);
+            throw new BusinessException("Failed to start process: " + e.getMessage());
         }
+    }
 
-        // Record history event
-        recordHistory(saved, EventType.PROCESS_STARTED, "Process started");
+    /**
+     * Deploy process definition to Camunda
+     * Returns the Camunda process definition ID
+     */
+    private String deployProcessToCamunda(ProcessDefinition definition) {
+        try {
+            String bpmnXml = definition.getBpmnXml();
+            if (bpmnXml == null || bpmnXml.isEmpty()) {
+                throw new BusinessException("Process definition has no BPMN XML");
+            }
 
-        log.info("Started process instance {} for definition {} (key: {})",
-                 saved.getId(), definition.getId(), definition.getProcessKey());
+            // Check if already deployed
+            CamundaProcessDefinition existingDef = camundaRepositoryService
+                    .createProcessDefinitionQuery()
+                    .processDefinitionKey(definition.getProcessKey())
+                    .latestVersion()
+                    .singleResult();
 
-        return saved;
+            if (existingDef != null) {
+                log.debug("Process {} already deployed to Camunda: {}",
+                    definition.getProcessKey(), existingDef.getId());
+                return existingDef.getId();
+            }
+
+            // Deploy to Camunda
+            Deployment deployment = camundaRepositoryService.createDeployment()
+                    .addInputStream(
+                        definition.getProcessKey() + ".bpmn",
+                        new ByteArrayInputStream(bpmnXml.getBytes())
+                    )
+                    .name(definition.getName())
+                    .enableDuplicateFiltering(true)
+                    .deploy();
+
+            log.info("Deployed process {} to Camunda: {}",
+                definition.getProcessKey(), deployment.getId());
+
+            // Get the deployed process definition
+            CamundaProcessDefinition deployedDef = camundaRepositoryService
+                    .createProcessDefinitionQuery()
+                    .deploymentId(deployment.getId())
+                    .singleResult();
+
+            return deployedDef.getId();
+
+        } catch (Exception e) {
+            log.error("Error deploying process to Camunda", e);
+            throw new BusinessException("Failed to deploy process to Camunda: " + e.getMessage());
+        }
     }
 
     /**
      * Suspend a running process instance
+     * Now also suspends the Camunda process instance
      */
     @Transactional
     public ProcessInstance suspendProcess(Long instanceId, String reason) {
@@ -95,18 +191,35 @@ public class ProcessExecutionService {
             throw new BusinessException(getMessage("instance.suspend.not-running"));
         }
 
-        instance.setStatus(ProcessInstanceStatus.SUSPENDED);
-        instance.setSuspensionReason(reason);
-        ProcessInstance updated = instanceRepository.save(instance);
+        try {
+            // Suspend in Camunda
+            if (instance.getEngineInstanceId() != null) {
+                camundaRuntimeService.suspendProcessInstanceById(
+                    instance.getEngineInstanceId()
+                );
+                log.info("Suspended Camunda process instance: {}",
+                    instance.getEngineInstanceId());
+            }
 
-        recordHistory(updated, EventType.PROCESS_SUSPENDED, "Process suspended: " + reason);
+            // Update our database
+            instance.setStatus(ProcessInstanceStatus.SUSPENDED);
+            instance.setSuspensionReason(reason);
+            ProcessInstance updated = instanceRepository.save(instance);
 
-        log.info("Suspended process instance {}", instanceId);
-        return updated;
+            recordHistory(updated, EventType.PROCESS_SUSPENDED, "Process suspended: " + reason);
+
+            log.info("Suspended process instance {}", instanceId);
+            return updated;
+
+        } catch (Exception e) {
+            log.error("Error suspending process instance", e);
+            throw new BusinessException("Failed to suspend process: " + e.getMessage());
+        }
     }
 
     /**
      * Resume a suspended process instance
+     * Now also resumes the Camunda process instance
      */
     @Transactional
     public ProcessInstance resumeProcess(Long instanceId) {
@@ -118,18 +231,35 @@ public class ProcessExecutionService {
             throw new BusinessException(getMessage("instance.resume.not-suspended"));
         }
 
-        instance.setStatus(ProcessInstanceStatus.RUNNING);
-        instance.setSuspensionReason(null);
-        ProcessInstance updated = instanceRepository.save(instance);
+        try {
+            // Resume in Camunda
+            if (instance.getEngineInstanceId() != null) {
+                camundaRuntimeService.activateProcessInstanceById(
+                    instance.getEngineInstanceId()
+                );
+                log.info("Resumed Camunda process instance: {}",
+                    instance.getEngineInstanceId());
+            }
 
-        recordHistory(updated, EventType.PROCESS_RESUMED, "Process resumed");
+            // Update our database
+            instance.setStatus(ProcessInstanceStatus.RUNNING);
+            instance.setSuspensionReason(null);
+            ProcessInstance updated = instanceRepository.save(instance);
 
-        log.info("Resumed process instance {}", instanceId);
-        return updated;
+            recordHistory(updated, EventType.PROCESS_RESUMED, "Process resumed");
+
+            log.info("Resumed process instance {}", instanceId);
+            return updated;
+
+        } catch (Exception e) {
+            log.error("Error resuming process instance", e);
+            throw new BusinessException("Failed to resume process: " + e.getMessage());
+        }
     }
 
     /**
      * Terminate a process instance
+     * Now also deletes the Camunda process instance
      */
     @Transactional
     public ProcessInstance terminateProcess(Long instanceId, String reason) {
@@ -141,18 +271,35 @@ public class ProcessExecutionService {
             throw new BusinessException(getMessage("instance.terminate.already-ended"));
         }
 
-        LocalDateTime endTime = LocalDateTime.now();
-        instance.setStatus(ProcessInstanceStatus.TERMINATED);
-        instance.setEndTime(endTime);
-        instance.setTerminationReason(reason);
-        instance.calculateDuration();
+        try {
+            // Terminate in Camunda
+            if (instance.getEngineInstanceId() != null) {
+                camundaRuntimeService.deleteProcessInstance(
+                    instance.getEngineInstanceId(),
+                    reason
+                );
+                log.info("Terminated Camunda process instance: {}",
+                    instance.getEngineInstanceId());
+            }
 
-        ProcessInstance updated = instanceRepository.save(instance);
+            // Update our database
+            LocalDateTime endTime = LocalDateTime.now();
+            instance.setStatus(ProcessInstanceStatus.TERMINATED);
+            instance.setEndTime(endTime);
+            instance.setTerminationReason(reason);
+            instance.calculateDuration();
 
-        recordHistory(updated, EventType.PROCESS_TERMINATED, "Process terminated: " + reason);
+            ProcessInstance updated = instanceRepository.save(instance);
 
-        log.info("Terminated process instance {}", instanceId);
-        return updated;
+            recordHistory(updated, EventType.PROCESS_TERMINATED, "Process terminated: " + reason);
+
+            log.info("Terminated process instance {}", instanceId);
+            return updated;
+
+        } catch (Exception e) {
+            log.error("Error terminating process instance", e);
+            throw new BusinessException("Failed to terminate process: " + e.getMessage());
+        }
     }
 
     /**
@@ -323,6 +470,22 @@ public class ProcessExecutionService {
     private String getCurrentUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null ? authentication.getName() : "system";
+    }
+
+    /**
+     * Get current authenticated user ID
+     * TODO: Enhance to fetch actual user ID from UserService
+     */
+    private Long getCurrentUserId() {
+        // For now, return a default ID
+        // In production, this should fetch the actual user ID from the authentication principal
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() != null) {
+            // Try to extract user ID from principal
+            // This will depend on your authentication setup
+            return 1L; // Placeholder
+        }
+        return null;
     }
 
     /**

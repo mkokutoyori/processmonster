@@ -161,6 +161,76 @@ public class NotificationService {
     }
 
     /**
+     * Send task assignment notification - used by Camunda listeners
+     */
+    @Async
+    public void sendTaskAssignmentNotification(Long userId, String taskName,
+                                               String taskDescription, java.util.Date dueDate) {
+        log.info("Notification: Task '{}' assigned to user ID '{}'", taskName, userId);
+
+        String dueDateStr = dueDate != null ? formatDateTime(
+            LocalDateTime.ofInstant(dueDate.toInstant(), java.time.ZoneId.systemDefault())
+        ) : "No due date";
+
+        String message = String.format(
+            "You have been assigned task: %s. Due: %s",
+            taskName,
+            dueDateStr
+        );
+
+        publishEvent(new TaskNotificationEvent(
+                null, // Task ID might not be available yet
+                userId.toString(),
+                "TASK_ASSIGNED_CAMUNDA",
+                message
+        ));
+    }
+
+    /**
+     * Send process start notification - used by Camunda listeners
+     */
+    @Async
+    public void sendProcessStartNotification(Long initiatorId, String processDefinitionId,
+                                            String processInstanceId) {
+        log.info("Notification: Process '{}' started by user ID '{}'",
+                processDefinitionId, initiatorId);
+
+        String message = String.format(
+            "Process instance %s has been started",
+            processInstanceId
+        );
+
+        publishEvent(new TaskNotificationEvent(
+                null,
+                initiatorId.toString(),
+                "PROCESS_STARTED",
+                message
+        ));
+    }
+
+    /**
+     * Send process completion notification - used by Camunda listeners
+     */
+    @Async
+    public void sendProcessCompletionNotification(Long initiatorId, String processDefinitionId,
+                                                  String processInstanceId) {
+        log.info("Notification: Process '{}' completed for user ID '{}'",
+                processDefinitionId, initiatorId);
+
+        String message = String.format(
+            "Process instance %s has been completed successfully",
+            processInstanceId
+        );
+
+        publishEvent(new TaskNotificationEvent(
+                null,
+                initiatorId.toString(),
+                "PROCESS_COMPLETED",
+                message
+        ));
+    }
+
+    /**
      * Publish notification event
      */
     private void publishEvent(TaskNotificationEvent event) {

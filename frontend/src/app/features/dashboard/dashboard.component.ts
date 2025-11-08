@@ -15,6 +15,8 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TranslateModule } from '@ngx-translate/core';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartConfiguration, ChartData } from 'chart.js';
 import { AuthService } from '../../core/services/auth.service';
 import { ReportService } from '../../core/services/report.service';
 
@@ -31,7 +33,8 @@ import { ReportService } from '../../core/services/report.service';
     MatChipsModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    TranslateModule
+    TranslateModule,
+    BaseChartDirective
   ],
   template: `
     <div class="dashboard-container">
@@ -100,6 +103,39 @@ import { ReportService } from '../../core/services/report.service';
           </mat-card>
         </mat-grid-tile>
       </mat-grid-list>
+
+      <!-- Charts Section -->
+      <div class="charts-grid" *ngIf="!isLoading">
+        <!-- Completion Trend Chart -->
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>{{ 'dashboard.completionTrend' | translate }}</mat-card-title>
+            <mat-card-subtitle>Last 7 days</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <canvas baseChart
+                    [data]="lineChartData"
+                    [options]="lineChartOptions"
+                    [type]="'line'">
+            </canvas>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Instance Status Distribution -->
+        <mat-card class="chart-card">
+          <mat-card-header>
+            <mat-card-title>{{ 'dashboard.instanceDistribution' | translate }}</mat-card-title>
+            <mat-card-subtitle>Current status</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <canvas baseChart
+                    [data]="doughnutChartData"
+                    [options]="doughnutChartOptions"
+                    [type]="'doughnut'">
+            </canvas>
+          </mat-card-content>
+        </mat-card>
+      </div>
 
       <!-- Quick Actions -->
       <mat-card class="quick-actions-card" *ngIf="!isLoading">
@@ -251,6 +287,26 @@ import { ReportService } from '../../core/services/report.service';
       justify-content: center;
     }
 
+    /* Charts Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 16px;
+      margin-bottom: 2rem;
+    }
+
+    .chart-card {
+      min-height: 350px;
+    }
+
+    .chart-card mat-card-content {
+      padding: 16px;
+    }
+
+    .chart-card canvas {
+      max-height: 280px;
+    }
+
     .kpi-card mat-card-content {
       text-align: center;
       padding: 1rem;
@@ -400,8 +456,97 @@ export class DashboardComponent implements OnInit {
   recentActivity: any[] = [];
   activityColumns: string[] = ['type', 'title', 'user', 'status', 'timestamp'];
 
+  // Line Chart Data (Completion Trend)
+  lineChartData: ChartData<'line'> = {
+    labels: [],
+    datasets: [
+      {
+        label: 'Completed Tasks',
+        data: [],
+        borderColor: '#1976d2',
+        backgroundColor: 'rgba(25, 118, 210, 0.1)',
+        fill: true,
+        tension: 0.4
+      },
+      {
+        label: 'Started Instances',
+        data: [],
+        borderColor: '#4caf50',
+        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+        fill: true,
+        tension: 0.4
+      }
+    ]
+  };
+
+  lineChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top'
+      },
+      tooltip: {
+        mode: 'index',
+        intersect: false
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0
+        }
+      }
+    }
+  };
+
+  // Doughnut Chart Data (Instance Distribution)
+  doughnutChartData: ChartData<'doughnut'> = {
+    labels: ['Running', 'Completed', 'Failed', 'Pending'],
+    datasets: [{
+      data: [0, 0, 0, 0],
+      backgroundColor: [
+        '#1976d2',  // Running - Blue
+        '#4caf50',  // Completed - Green
+        '#f44336',  // Failed - Red
+        '#ff9800'   // Pending - Orange
+      ],
+      hoverBackgroundColor: [
+        '#1565c0',
+        '#388e3c',
+        '#d32f2f',
+        '#f57c00'
+      ]
+    }]
+  };
+
+  doughnutChartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom'
+      },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            const label = context.label || '';
+            const value = context.parsed || 0;
+            const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
+            const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+            return `${label}: ${value} (${percentage}%)`;
+          }
+        }
+      }
+    }
+  };
+
   ngOnInit(): void {
     this.loadDashboardData();
+    this.loadChartData();
   }
 
   loadDashboardData(): void {
@@ -411,10 +556,12 @@ export class DashboardComponent implements OnInit {
     this.reportService.getDashboardStats().subscribe({
       next: (stats) => {
         this.stats = stats;
+        this.updateDoughnutChart(); // Update chart with new data
       },
       error: () => {
         // Use mock data if API fails
         this.loadMockStats();
+        this.updateDoughnutChart(); // Update chart with mock data
       }
     });
 
@@ -504,6 +651,46 @@ export class DashboardComponent implements OnInit {
       'PENDING': ''
     };
     return colors[status] || '';
+  }
+
+  loadChartData(): void {
+    // Load trend data for line chart
+    this.reportService.getDailyCompletionTrend(7).subscribe({
+      next: (trendData) => {
+        this.lineChartData.labels = trendData.map((d: any) => d.date);
+        this.lineChartData.datasets[0].data = trendData.map((d: any) => d.completedTasks || 0);
+        this.lineChartData.datasets[1].data = trendData.map((d: any) => d.startedInstances || 0);
+      },
+      error: () => {
+        // Use mock data if API fails
+        this.loadMockTrendData();
+      }
+    });
+
+    // Update doughnut chart with instance distribution
+    this.updateDoughnutChart();
+  }
+
+  loadMockTrendData(): void {
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    });
+
+    this.lineChartData.labels = last7Days;
+    this.lineChartData.datasets[0].data = [12, 19, 15, 25, 22, 30, 28]; // Completed tasks
+    this.lineChartData.datasets[1].data = [8, 11, 13, 15, 14, 18, 16];  // Started instances
+  }
+
+  updateDoughnutChart(): void {
+    // Use mock data or update from stats
+    this.doughnutChartData.datasets[0].data = [
+      this.stats.runningInstances || 23,
+      this.stats.completedInstances || 118,
+      this.stats.failedInstances || 15,
+      Math.max(0, this.stats.totalInstances - this.stats.runningInstances - this.stats.completedInstances - this.stats.failedInstances) || 0
+    ];
   }
 
   navigateTo(route: string): void {

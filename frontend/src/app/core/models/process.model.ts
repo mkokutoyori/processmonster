@@ -498,3 +498,63 @@ export interface ValidationResponse {
   errors?: string[];
   message?: string;
 }
+
+// ============================================================================
+// Dashboard & Metrics Models
+// ============================================================================
+
+/**
+ * System KPIs
+ */
+export interface SystemKPIs {
+  activeProcesses: number;
+  completedProcessesToday: number;
+  failedProcessesToday: number;
+  totalProcesses: number;
+  activeTasks: number;
+  overdueTasks: number;
+  tasksCompletedToday: number;
+  totalTasks: number;
+  avgTaskCompletionTimeMinutes: number;
+  avgProcessDurationHours: number;
+  activeUsers: number;
+  totalUsers: number;
+}
+
+/**
+ * Status Statistics
+ */
+export interface StatusStats {
+  stats: { [status: string]: number };
+}
+
+/**
+ * User Task Statistics
+ */
+export interface UserTaskStats {
+  assigned: number;
+  completed: number;
+  inProgress: number;
+  overdue: number;
+  avgCompletionTimeMinutes: number;
+}
+
+/**
+ * Process Definition Statistics
+ */
+export interface ProcessDefinitionStats {
+  processDefinitionKey: string;
+  total: number;
+  active: number;
+  completed: number;
+  failed: number;
+  avgDurationHours: number;
+}
+
+/**
+ * Daily Completion Trend
+ */
+export interface DailyCompletionTrend {
+  dailyCompletions: { [date: string]: number };
+  days: number;
+}

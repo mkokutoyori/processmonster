@@ -41,7 +41,9 @@
     "close": "Fermer",
     "edit": "Modifier",
     "view": "Voir",
-    "details": "Détails"
+    "details": "Détails",
+    "language": "Langue",
+    "recentActivity": "Activité récente"
   },
   "validation": {
     "required": "{{field}} est requis",

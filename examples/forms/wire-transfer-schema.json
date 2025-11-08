@@ -1,0 +1,212 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Wire Transfer Request Form",
+  "description": "Form for initiating domestic and international wire transfers",
+  "type": "object",
+  "required": [
+    "transferType",
+    "amount",
+    "currency",
+    "senderAccountNumber",
+    "beneficiaryName",
+    "beneficiaryAccountNumber",
+    "beneficiaryBankName",
+    "transferPurpose",
+    "agreedToFees"
+  ],
+  "properties": {
+    "transferType": {
+      "type": "string",
+      "title": "Transfer Type",
+      "enum": ["domestic", "international"],
+      "description": "Select domestic for transfers within the US, international for foreign transfers"
+    },
+    "amount": {
+      "type": "number",
+      "title": "Transfer Amount",
+      "minimum": 1,
+      "maximum": 1000000,
+      "description": "Enter the amount to transfer"
+    },
+    "currency": {
+      "type": "string",
+      "title": "Currency",
+      "enum": ["USD", "EUR", "GBP", "CAD", "AUD", "JPY", "CHF", "CNY", "MXN"],
+      "default": "USD"
+    },
+    "senderAccountNumber": {
+      "type": "string",
+      "title": "Sender Account Number",
+      "pattern": "^[0-9]{10,16}$",
+      "description": "Your account number from which funds will be debited"
+    },
+    "beneficiaryName": {
+      "type": "string",
+      "title": "Beneficiary Name",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "Full name of the recipient"
+    },
+    "beneficiaryAccountNumber": {
+      "type": "string",
+      "title": "Beneficiary Account Number",
+      "minLength": 1,
+      "maxLength": 34,
+      "description": "IBAN for international, account number for domestic"
+    },
+    "beneficiaryBankName": {
+      "type": "string",
+      "title": "Beneficiary Bank Name",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "beneficiaryBankAddress": {
+      "type": "string",
+      "title": "Beneficiary Bank Address",
+      "maxLength": 200
+    },
+    "beneficiaryAddress": {
+      "type": "string",
+      "title": "Beneficiary Address",
+      "maxLength": 200,
+      "description": "Required for international transfers"
+    },
+    "swiftCode": {
+      "type": "string",
+      "title": "SWIFT/BIC Code",
+      "pattern": "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$",
+      "description": "Required for international transfers"
+    },
+    "routingNumber": {
+      "type": "string",
+      "title": "Routing Number (ABA)",
+      "pattern": "^[0-9]{9}$",
+      "description": "Required for domestic US transfers"
+    },
+    "intermediaryBankName": {
+      "type": "string",
+      "title": "Intermediary Bank Name",
+      "maxLength": 100,
+      "description": "Optional: Required for some international transfers"
+    },
+    "intermediarySwiftCode": {
+      "type": "string",
+      "title": "Intermediary SWIFT Code",
+      "pattern": "^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$"
+    },
+    "transferPurpose": {
+      "type": "string",
+      "title": "Purpose of Transfer",
+      "enum": [
+        "family-support",
+        "gift",
+        "loan-repayment",
+        "salary-payment",
+        "business-payment",
+        "investment",
+        "property-purchase",
+        "education",
+        "medical",
+        "other"
+      ]
+    },
+    "transferDescription": {
+      "type": "string",
+      "title": "Transfer Description/Reference",
+      "maxLength": 140,
+      "description": "Additional details about the transfer purpose"
+    },
+    "urgency": {
+      "type": "string",
+      "title": "Transfer Urgency",
+      "enum": ["standard", "urgent", "same-day"],
+      "default": "standard",
+      "description": "Standard: 1-2 business days, Urgent: Same business day, Same-day: Within hours (additional fees apply)"
+    },
+    "scheduledDate": {
+      "type": "string",
+      "title": "Scheduled Transfer Date",
+      "format": "date",
+      "description": "Leave blank for immediate transfer"
+    },
+    "notifyBeneficiary": {
+      "type": "boolean",
+      "title": "Notify beneficiary via email?",
+      "default": false
+    },
+    "beneficiaryEmail": {
+      "type": "string",
+      "title": "Beneficiary Email Address",
+      "format": "email"
+    },
+    "senderPhone": {
+      "type": "string",
+      "title": "Sender Phone Number",
+      "pattern": "^[0-9]{10}$",
+      "description": "For verification purposes"
+    },
+    "sourceOfFunds": {
+      "type": "string",
+      "title": "Source of Funds",
+      "enum": [
+        "salary",
+        "savings",
+        "business-income",
+        "investment-returns",
+        "loan",
+        "gift",
+        "inheritance",
+        "other"
+      ],
+      "description": "Required for compliance (AML/KYC)"
+    },
+    "relationshipToBeneficiary": {
+      "type": "string",
+      "title": "Relationship to Beneficiary",
+      "enum": [
+        "self",
+        "family",
+        "friend",
+        "business-partner",
+        "employee",
+        "vendor",
+        "customer",
+        "other"
+      ]
+    },
+    "estimatedFee": {
+      "type": "number",
+      "title": "Estimated Transfer Fee (read-only)",
+      "description": "Fee will be calculated based on transfer type and amount",
+      "readOnly": true
+    },
+    "agreedToFees": {
+      "type": "boolean",
+      "title": "I agree to pay the applicable transfer fees",
+      "const": true
+    },
+    "agreedToTerms": {
+      "type": "boolean",
+      "title": "I agree to the wire transfer terms and conditions",
+      "const": true
+    },
+    "confirmAccuracy": {
+      "type": "boolean",
+      "title": "I confirm all information is accurate",
+      "const": true,
+      "description": "Incorrect information may result in delays or loss of funds"
+    }
+  },
+  "additionalProperties": false,
+  "if": {
+    "properties": {
+      "transferType": { "const": "international" }
+    }
+  },
+  "then": {
+    "required": ["swiftCode", "beneficiaryAddress"]
+  },
+  "else": {
+    "required": ["routingNumber"]
+  }
+}

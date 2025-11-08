@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormControl, ReactiveFormsModule, Validators, AbstractControl } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -12,6 +12,14 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+interface FieldCondition {
+  fieldKey: string;
+  operator: 'equals' | 'notEquals' | 'contains' | 'greaterThan' | 'lessThan' | 'isEmpty' | 'isNotEmpty';
+  value?: any;
+}
 
 interface FormField {
   id: string;
@@ -30,6 +38,7 @@ interface FormField {
     max?: number;
     pattern?: string;
   };
+  conditions?: FieldCondition[];
   order: number;
 }
 
@@ -76,7 +85,7 @@ interface FormDefinition {
         <mat-card-content>
           <form [formGroup]="dynamicForm" (ngSubmit)="onSubmit()" *ngIf="dynamicForm">
             <div class="form-fields">
-              <div *ngFor="let field of sortedFields" class="form-field">
+              <div *ngFor="let field of sortedFields" class="form-field" [hidden]="!isFieldVisible(field)">
                 <!-- Text Input -->
                 <mat-form-field appearance="outline" class="full-width"
                                 *ngIf="field.type === 'text' || field.type === 'email'">
@@ -361,7 +370,7 @@ interface FormDefinition {
     }
   `]
 })
-export class FormRendererComponent implements OnInit, OnChanges {
+export class FormRendererComponent implements OnInit, OnChanges, OnDestroy {
   @Input() formDefinition: FormDefinition | null = null;
   @Input() initialValues: any = {};
   @Input() submitButtonText = 'Submit';
@@ -377,6 +386,10 @@ export class FormRendererComponent implements OnInit, OnChanges {
   sortedFields: FormField[] = [];
   isSubmitting = false;
   errorMessage = '';
+
+  // Conditional visibility tracking
+  private destroy$ = new Subject<void>();
+  fieldVisibility = new Map<string, boolean>();
 
   constructor(
     private fb: FormBuilder,
@@ -398,6 +411,11 @@ export class FormRendererComponent implements OnInit, OnChanges {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   buildForm(): void {
     if (!this.formDefinition) {
       this.errorMessage = 'No form definition provided';
@@ -416,6 +434,9 @@ export class FormRendererComponent implements OnInit, OnChanges {
         { value: defaultValue, disabled: field.disabled },
         validators
       );
+
+      // Initialize field visibility
+      this.fieldVisibility.set(field.key, true);
     });
 
     this.dynamicForm = this.fb.group(group);
@@ -424,6 +445,9 @@ export class FormRendererComponent implements OnInit, OnChanges {
     if (this.initialValues && Object.keys(this.initialValues).length > 0) {
       this.patchFormValues();
     }
+
+    // Setup conditional visibility listeners
+    this.setupConditionalVisibility();
   }
 
   buildValidators(field: FormField): any[] {
@@ -514,5 +538,91 @@ export class FormRendererComponent implements OnInit, OnChanges {
       }
       this.snackBar.open('Form reset', 'Close', { duration: 2000 });
     }
+  }
+
+  // Conditional Visibility Methods
+  setupConditionalVisibility(): void {
+    // Listen to form value changes
+    this.dynamicForm.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.updateFieldVisibility();
+      });
+
+    // Initial visibility check
+    this.updateFieldVisibility();
+  }
+
+  updateFieldVisibility(): void {
+    this.sortedFields.forEach(field => {
+      if (field.conditions && field.conditions.length > 0) {
+        // Field has conditions - evaluate them
+        const isVisible = this.evaluateConditions(field.conditions);
+        this.fieldVisibility.set(field.key, isVisible);
+
+        // If field becomes invisible, clear its value and disable validation
+        const control = this.getControl(field.key);
+        if (!isVisible && control) {
+          control.setValue(null, { emitEvent: false });
+          control.clearValidators();
+          control.updateValueAndValidity({ emitEvent: false });
+        } else if (isVisible && control) {
+          // Re-apply validators when field becomes visible
+          const validators = this.buildValidators(field);
+          control.setValidators(validators);
+          control.updateValueAndValidity({ emitEvent: false });
+        }
+      } else {
+        // No conditions - always visible
+        this.fieldVisibility.set(field.key, true);
+      }
+    });
+  }
+
+  evaluateConditions(conditions: FieldCondition[]): boolean {
+    // All conditions must be true (AND logic)
+    return conditions.every(condition => this.evaluateCondition(condition));
+  }
+
+  evaluateCondition(condition: FieldCondition): boolean {
+    const control = this.getControl(condition.fieldKey);
+    if (!control) {
+      return false;
+    }
+
+    const fieldValue = control.value;
+
+    switch (condition.operator) {
+      case 'equals':
+        return fieldValue == condition.value;
+
+      case 'notEquals':
+        return fieldValue != condition.value;
+
+      case 'contains':
+        if (typeof fieldValue === 'string' && typeof condition.value === 'string') {
+          return fieldValue.toLowerCase().includes(condition.value.toLowerCase());
+        }
+        return false;
+
+      case 'greaterThan':
+        return Number(fieldValue) > Number(condition.value);
+
+      case 'lessThan':
+        return Number(fieldValue) < Number(condition.value);
+
+      case 'isEmpty':
+        return !fieldValue || fieldValue === '' || fieldValue === null || fieldValue === undefined;
+
+      case 'isNotEmpty':
+        return fieldValue && fieldValue !== '' && fieldValue !== null && fieldValue !== undefined;
+
+      default:
+        return false;
+    }
+  }
+
+  isFieldVisible(field: FormField): boolean {
+    return this.fieldVisibility.get(field.key) ?? true;
   }
 }

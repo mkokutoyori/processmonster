@@ -1,0 +1,72 @@
+version: '3.8'
+
+# Development environment with additional services and tools
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  # Backend with development profile
+  backend:
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_JPA_SHOW_SQL: true
+      LOGGING_LEVEL_ROOT: DEBUG
+      LOGGING_LEVEL_COM_PROCESSMONSTER: DEBUG
+    volumes:
+      # Mount source for hot reload (if using spring-boot-devtools)
+      - ./backend/src:/app/src:ro
+    ports:
+      # Expose debug port
+      - "5005:5005"
+    command: >
+      sh -c "java
+      -Xdebug
+      -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      $JAVA_OPTS
+      -jar app.jar"
+
+  # Frontend with development server (hot reload)
+  frontend-dev:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: processmonster-frontend-dev
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "4200:4200"
+    environment:
+      - NODE_ENV=development
+    command: npm run start:dev
+    networks:
+      - processmonster-network
+
+  # Mailhog for email testing
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: processmonster-mailhog
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+    networks:
+      - processmonster-network
+
+  # Redis for caching (optional enhancement)
+  redis:
+    image: redis:7-alpine
+    container_name: processmonster-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - processmonster-network
+
+volumes:
+  redis_data:
+    driver: local

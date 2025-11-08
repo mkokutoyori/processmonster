@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -18,6 +18,14 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FormService } from '../../core/services/form.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+
+interface FieldCondition {
+  fieldKey: string;  // Field to watch
+  operator: 'equals' | 'notEquals' | 'contains' | 'greaterThan' | 'lessThan' | 'isEmpty' | 'isNotEmpty';
+  value?: any;
+}
 
 interface FormField {
   id: string;
@@ -36,6 +44,7 @@ interface FormField {
     max?: number;
     pattern?: string;
   };
+  conditions?: FieldCondition[];  // Conditional visibility
   order: number;
 }
 
@@ -224,6 +233,61 @@ interface FormField {
                                 (input)="updateFieldOptions(field, $event)"
                                 placeholder="Option 1&#10;Option 2&#10;Option 3"></textarea>
                     </div>
+
+                    <!-- Conditional Visibility -->
+                    <mat-expansion-panel class="conditional-panel">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          <mat-icon>visibility</mat-icon>
+                          Conditional Visibility
+                          <mat-chip *ngIf="field.conditions && field.conditions.length > 0" class="condition-badge">
+                            {{ field.conditions.length }}
+                          </mat-chip>
+                        </mat-panel-title>
+                      </mat-expansion-panel-header>
+
+                      <div class="conditional-config">
+                        <p class="hint">Show this field only when conditions are met</p>
+
+                        <div *ngFor="let condition of field.conditions || []; let condIndex = index" class="condition-item">
+                          <mat-form-field appearance="outline">
+                            <mat-label>When field</mat-label>
+                            <mat-select [(ngModel)]="condition.fieldKey">
+                              <mat-option *ngFor="let otherField of getAvailableFields(field)" [value]="otherField.key">
+                                {{ otherField.label }}
+                              </mat-option>
+                            </mat-select>
+                          </mat-form-field>
+
+                          <mat-form-field appearance="outline">
+                            <mat-label>Operator</mat-label>
+                            <mat-select [(ngModel)]="condition.operator">
+                              <mat-option value="equals">Equals</mat-option>
+                              <mat-option value="notEquals">Not Equals</mat-option>
+                              <mat-option value="contains">Contains</mat-option>
+                              <mat-option value="greaterThan">Greater Than</mat-option>
+                              <mat-option value="lessThan">Less Than</mat-option>
+                              <mat-option value="isEmpty">Is Empty</mat-option>
+                              <mat-option value="isNotEmpty">Is Not Empty</mat-option>
+                            </mat-select>
+                          </mat-form-field>
+
+                          <mat-form-field appearance="outline" *ngIf="!['isEmpty', 'isNotEmpty'].includes(condition.operator)">
+                            <mat-label>Value</mat-label>
+                            <input matInput [(ngModel)]="condition.value">
+                          </mat-form-field>
+
+                          <button mat-icon-button color="warn" (click)="removeCondition(field, condIndex)" matTooltip="Remove condition">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+
+                        <button mat-stroked-button (click)="addCondition(field)">
+                          <mat-icon>add</mat-icon>
+                          Add Condition
+                        </button>
+                      </div>
+                    </mat-expansion-panel>
 
                     <!-- Validation Rules -->
                     <mat-expansion-panel class="validation-panel">
@@ -521,6 +585,39 @@ interface FormField {
       resize: vertical;
     }
 
+    .conditional-panel {
+      margin-top: 16px;
+    }
+
+    .conditional-config {
+      padding: 16px 0;
+    }
+
+    .conditional-config .hint {
+      margin: 0 0 16px 0;
+      color: #666;
+      font-size: 13px;
+    }
+
+    .condition-item {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    .condition-badge {
+      margin-left: 8px;
+      font-size: 10px;
+      min-height: 20px;
+      background-color: #4caf50 !important;
+      color: white !important;
+    }
+
     .validation-panel {
       margin-top: 16px;
     }
@@ -595,12 +692,14 @@ interface FormField {
     }
   `]
 })
-export class FormBuilderComponent implements OnInit {
+export class FormBuilderComponent implements OnInit, OnDestroy {
   formDefinitionForm: FormGroup;
   fields: FormField[] = [];
   isEditMode = false;
   formId: number | null = null;
   private fieldCounter = 0;
+  private autoSaveSubject = new Subject<void>();
+  private isAutoSaving = false;
 
   constructor(
     private fb: FormBuilder,
@@ -614,6 +713,14 @@ export class FormBuilderComponent implements OnInit {
       key: ['', Validators.required],
       description: ['']
     });
+
+    // Setup auto-save with debounce
+    this.autoSaveSubject.pipe(
+      debounceTime(2000),  // Wait 2 seconds after last change
+      distinctUntilChanged()
+    ).subscribe(() => {
+      this.performAutoSave();
+    });
   }
 
   ngOnInit(): void {
@@ -624,6 +731,15 @@ export class FormBuilderComponent implements OnInit {
         this.loadForm();
       }
     });
+
+    // Watch for form changes to trigger auto-save
+    this.formDefinitionForm.valueChanges.subscribe(() => {
+      this.triggerAutoSave();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.autoSaveSubject.complete();
   }
 
   loadForm(): void {
@@ -741,5 +857,63 @@ export class FormBuilderComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/forms']);
+  }
+
+  // Conditional Fields Methods
+  addCondition(field: FormField): void {
+    if (!field.conditions) {
+      field.conditions = [];
+    }
+    field.conditions.push({
+      fieldKey: '',
+      operator: 'equals',
+      value: ''
+    });
+    this.triggerAutoSave();
+  }
+
+  removeCondition(field: FormField, index: number): void {
+    if (field.conditions) {
+      field.conditions.splice(index, 1);
+      this.triggerAutoSave();
+    }
+  }
+
+  getAvailableFields(currentField: FormField): FormField[] {
+    // Return all fields except the current one
+    return this.fields.filter(field => field.id !== currentField.id);
+  }
+
+  // Auto-save Methods
+  triggerAutoSave(): void {
+    if (this.isEditMode && this.formId) {
+      this.autoSaveSubject.next();
+    }
+  }
+
+  performAutoSave(): void {
+    if (this.isAutoSaving || !this.formDefinitionForm.valid) {
+      return;
+    }
+
+    this.isAutoSaving = true;
+    const formData = {
+      ...this.formDefinitionForm.value,
+      fields: this.fields
+    };
+
+    if (this.formId) {
+      this.formService.updateForm(this.formId, formData).subscribe({
+        next: () => {
+          this.isAutoSaving = false;
+          // Silent auto-save - don't show snackbar for every auto-save
+          console.log('Form auto-saved');
+        },
+        error: () => {
+          this.isAutoSaving = false;
+          console.error('Auto-save failed');
+        }
+      });
+    }
   }
 }

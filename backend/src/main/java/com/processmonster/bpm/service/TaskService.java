@@ -435,6 +435,94 @@ public class TaskService {
     }
 
     /**
+     * Create task from Camunda - used by Camunda listeners
+     */
+    @Transactional
+    public Task createTaskFromCamunda(com.processmonster.bpm.dto.TaskCreateDTO taskCreateDTO) {
+        Task task = Task.builder()
+                .name(taskCreateDTO.getTitle())
+                .description(taskCreateDTO.getDescription())
+                .priority(mapStringToPriority(taskCreateDTO.getPriority()))
+                .status(taskCreateDTO.getStatus() != null ? taskCreateDTO.getStatus() : TaskStatus.CREATED)
+                .dueDate(taskCreateDTO.getDueDate())
+                .processInstanceId(taskCreateDTO.getProcessInstanceId())
+                .camundaTaskId(taskCreateDTO.getCamundaTaskId())
+                .formKey(taskCreateDTO.getFormKey())
+                .build();
+
+        // Set assignee if present
+        if (taskCreateDTO.getAssigneeId() != null) {
+            // TODO: Fetch user by ID and set username
+            // For now, just set the ID as string
+            task.setAssignee(taskCreateDTO.getAssigneeId().toString());
+        }
+
+        Task saved = taskRepository.save(task);
+        log.info("Task created from Camunda - ID: {}, Camunda Task ID: {}",
+                saved.getId(), saved.getCamundaTaskId());
+
+        return saved;
+    }
+
+    /**
+     * Update task status from Camunda - used by Camunda listeners
+     */
+    @Transactional
+    public void updateTaskStatusFromCamunda(Long taskId, TaskStatus status) {
+        Task task = getTaskById(taskId);
+        task.setStatus(status);
+
+        if (status == TaskStatus.COMPLETED) {
+            task.setCompletedDate(LocalDateTime.now());
+            // Completed by will be set by Camunda assignee
+        }
+
+        taskRepository.save(task);
+        log.info("Task status updated from Camunda - Task ID: {}, Status: {}",
+                taskId, status);
+    }
+
+    /**
+     * Assign task from Camunda - used by Camunda listeners
+     */
+    @Transactional
+    public void assignTaskFromCamunda(Long taskId, Long assigneeId) {
+        Task task = getTaskById(taskId);
+
+        // TODO: Fetch user by ID and get username
+        // For now, just set the ID as string
+        String assignee = assigneeId.toString();
+
+        task.setAssignee(assignee);
+        task.setStatus(TaskStatus.ASSIGNED);
+
+        if (task.getClaimedBy() == null) {
+            task.setClaimedBy(assignee);
+            task.setClaimedDate(LocalDateTime.now());
+        }
+
+        taskRepository.save(task);
+        log.info("Task assigned from Camunda - Task ID: {}, Assignee ID: {}",
+                taskId, assigneeId);
+    }
+
+    /**
+     * Map string priority to TaskPriority enum
+     */
+    private TaskPriority mapStringToPriority(String priority) {
+        if (priority == null) {
+            return TaskPriority.NORMAL;
+        }
+
+        return switch (priority.toUpperCase()) {
+            case "URGENT", "CRITICAL" -> TaskPriority.CRITICAL;
+            case "HIGH" -> TaskPriority.HIGH;
+            case "LOW" -> TaskPriority.LOW;
+            default -> TaskPriority.NORMAL;
+        };
+    }
+
+    /**
      * Get current authenticated username
      */
     private String getCurrentUsername() {

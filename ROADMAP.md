@@ -208,11 +208,11 @@
 | Composant ProcessList | ✅ | 2025-11-07 | Material Table, pagination, search, filters |
 | Routes processes | ✅ | 2025-11-07 | Lazy loading configuration |
 | Page création processus | ✅ | 2025-11-08 | Multi-step wizard (blank/template/import) |
-| Composant BpmnEditor | ⏳ | - | À implémenter Phase suivante |
-| Page éditeur processus | ⏳ | - | bpmn-js + toolbar |
+| Composant BpmnEditor | ✅ | 2025-11-08 | bpmn-js integration with toolbar |
+| Page éditeur processus | ✅ | 2025-11-08 | Full editor with save/load/export |
 | Modal import BPMN | ✅ | 2025-11-08 | File upload in creation wizard |
-| Palette BPMN personnalisée | ⏳ | - | Éléments bancaires |
-| Validation visuelle | ⏳ | - | Erreurs en temps réel |
+| Palette BPMN personnalisée | ⏳ | - | Éléments bancaires (future enhancement) |
+| Validation visuelle | ✅ | 2025-11-08 | BPMN XML validation with user feedback |
 
 ### Décisions techniques
 - **BPMN:** Standard BPMN 2.0 XML avec validation XSD
@@ -264,7 +264,7 @@
 | Service ProcessInstanceService | ✅ | 2025-11-07 | 11 méthodes API complètes |
 | Page liste instances | ✅ | 2025-11-07 | Material table, filters, pagination, status chips |
 | Page détail instance | ✅ | 2025-11-07 | Tabs (overview, history, variables), actions (suspend/resume/cancel) |
-| Composant visualisation BPMN | ⏳ | - | À implémenter (bpmn-js integration) |
+| Composant visualisation BPMN | ✅ | 2025-11-08 | BpmnEditorComponent (reusable for viewing) |
 | Modal variables processus | ✅ | 2025-11-07 | Expansion panel in detail view |
 | Page historique exécution | ✅ | 2025-11-07 | Timeline view in detail tab |
 | Actions suspend/resume/cancel | ✅ | 2025-11-07 | Action buttons with confirmation |
@@ -399,8 +399,8 @@
 | Composant FormList | ✅ | 2025-11-08 | List, search, filter, duplicate, export JSON |
 | Composant field types (text, number, date, etc.) | ✅ | 2025-11-08 | 8 types: text, number, email, date, select, checkbox, textarea, radio |
 | Validation client (Reactive Forms) | ✅ | 2025-11-08 | Built-in validators + custom rules (minLength, maxLength, min, max, pattern) |
-| Gestion champs conditionnels | ⏳ | - | RxJS pour réactivité (à implémenter) |
-| Auto-save | ⏳ | - | Debounce + localStorage (à implémenter) |
+| Gestion champs conditionnels | ✅ | 2025-11-08 | RxJS valueChanges, 7 operators, AND logic, dynamic validators |
+| Auto-save | ✅ | 2025-11-08 | Debounce 2s avec RxJS Subject, silent background saves |
 | Preview formulaire | ✅ | 2025-11-08 | Live preview in FormBuilder right panel |
 
 ### Example Schemas
@@ -417,8 +417,13 @@
 - **Draft vs. Submit:** saveDraft() = JSON format check only, submitForm() = full validation
 - **Workflow:** DRAFT → SUBMITTED → APPROVED/REJECTED/CANCELLED
 - **UI Schema:** Support uiSchemaJson pour hints de rendu (ui:widget, ui:placeholder, etc.)
-- **Conditional Fields:** JSON Schema if/then/else pour champs conditionnels
-- **Frontend Builder:** À implémenter avec formio.js ou custom drag & drop (Phase future)
+- **Conditional Fields:**
+  - Backend: JSON Schema if/then/else
+  - Frontend: RxJS valueChanges avec 7 operators (equals, notEquals, contains, greaterThan, lessThan, isEmpty, isNotEmpty)
+  - Logic: AND for multiple conditions
+  - Validators dynamiquement activés/désactivés
+- **Frontend Builder:** Custom drag & drop avec Angular CDK (✅ implémenté)
+- **Auto-save:** Debounce 2s avec RxJS Subject, silent saves (✅ implémenté)
 - **Compliance:** Schemas incluent champs KYC, AML, PATRIOT Act, FCRA, E-Sign Act
 - **Security:** RBAC @PreAuthorize (FORM_READ, FORM_CREATE, FORM_UPDATE, FORM_DELETE)
 
@@ -666,6 +671,83 @@
 3. ⏳ Initialiser projet Angular 17+
 4. ⏳ Configuration i18n FR/EN backend et frontend
 5. ⏳ Configuration CORS, Swagger, profils
+
+---
+
+## 🚀 Phase 11 - Configuration de Déploiement
+**Statut:** ✅ Terminé
+**Début:** 2025-11-08
+**Fin:** 2025-11-08
+
+### Tâches Docker
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| Dockerfile backend | ✅ | 2025-11-08 | Multi-stage build, JRE 17, non-root user, health checks |
+| Dockerfile frontend | ✅ | 2025-11-08 | Multi-stage build, Nginx Alpine, gzip, security headers |
+| .dockerignore backend | ✅ | 2025-11-08 | Optimisation du contexte de build |
+| .dockerignore frontend | ✅ | 2025-11-08 | Optimisation du contexte de build |
+| docker-compose.yml | ✅ | 2025-11-08 | PostgreSQL, backend, frontend, pgAdmin, networks, volumes |
+| docker-compose.dev.yml | ✅ | 2025-11-08 | Development mode avec hot reload, MailHog, Redis |
+| nginx.conf | ✅ | 2025-11-08 | Configuration Nginx avec gzip, security headers |
+| nginx-default.conf | ✅ | 2025-11-08 | Reverse proxy vers backend, Angular routing |
+
+### Scripts et Automatisation
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| deploy-docker.sh | ✅ | 2025-11-08 | Script de déploiement avec validation env dev/prod |
+| Makefile | ✅ | 2025-11-08 | 25+ commandes: build, deploy, logs, backup, health |
+| .env.example | ✅ | 2025-11-08 | Template configuration avec guidelines sécurité |
+
+### CI/CD
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| GitHub Actions workflow | ✅ | 2025-11-08 | Tests backend/frontend, Docker build, security scan, deploy |
+| Backend tests job | ✅ | 2025-11-08 | Maven tests + coverage (Codecov) |
+| Frontend tests job | ✅ | 2025-11-08 | npm tests + lint + coverage |
+| Docker build job | ✅ | 2025-11-08 | Multi-platform build, push to Docker Hub |
+| Security scan job | ✅ | 2025-11-08 | Trivy vulnerability scanner |
+| Deploy production job | ✅ | 2025-11-08 | SSH deployment + Slack notifications |
+
+### Kubernetes
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| deployment.yaml | ✅ | 2025-11-08 | Manifests complets K8s |
+| PostgreSQL StatefulSet | ✅ | 2025-11-08 | Persistent volume, health checks |
+| Backend Deployment | ✅ | 2025-11-08 | 2 replicas, health checks, resources |
+| Frontend Deployment | ✅ | 2025-11-08 | 2 replicas, health checks |
+| Services | ✅ | 2025-11-08 | ClusterIP backend, LoadBalancer frontend |
+| Ingress | ✅ | 2025-11-08 | TLS/SSL, cert-manager, routing |
+| HorizontalPodAutoscaler | ✅ | 2025-11-08 | Backend auto-scaling 2-10 pods |
+| Secrets | ✅ | 2025-11-08 | Database + JWT secrets |
+| Kubernetes README | ✅ | 2025-11-08 | Deployment guide, scaling, monitoring |
+
+### Documentation
+
+| Tâche | Statut | Date | Notes |
+|-------|--------|------|-------|
+| DEPLOYMENT.md | ✅ | 2025-11-08 | Guide complet de déploiement |
+| Quick Start section | ✅ | 2025-11-08 | 5 étapes pour démarrer |
+| Configuration guide | ✅ | 2025-11-08 | Variables env, sécurité |
+| Production setup | ✅ | 2025-11-08 | Server prep, SSL, systemd |
+| Cloud platforms | ✅ | 2025-11-08 | AWS, GCP, Azure guides |
+| Monitoring section | ✅ | 2025-11-08 | Health checks, logs, backups |
+| Troubleshooting | ✅ | 2025-11-08 | Solutions problèmes courants |
+
+### Décisions techniques
+- **Docker:** Multi-stage builds pour optimisation taille images
+- **Security:** Non-root users, minimal base images (Alpine)
+- **Health Checks:** Tous les services avec healthcheck
+- **Orchestration:** Docker Compose pour dev, Kubernetes pour prod
+- **CI/CD:** GitHub Actions avec tests, build, scan, deploy
+- **Monitoring:** Actuator endpoints, container stats
+- **Backups:** Automated database backups avec cron
+- **Scaling:** HPA pour backend (CPU 70%, Memory 80%)
+- **TLS:** cert-manager pour certificats automatiques
+- **Logs:** Centralized logging ready (ELK stack compatible)
 
 ---
 

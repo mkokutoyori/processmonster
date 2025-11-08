@@ -262,12 +262,12 @@
 |-------|--------|------|-------|
 | Models TypeScript | ✅ | 2025-11-07 | ProcessInstance, ExecutionHistory, StartRequest |
 | Service ProcessInstanceService | ✅ | 2025-11-07 | 11 méthodes API complètes |
-| Page liste instances | ⏳ | - | À implémenter |
-| Page détail instance | ⏳ | - | À implémenter |
-| Composant visualisation BPMN | ⏳ | - | À implémenter |
-| Modal variables processus | ⏳ | - | À implémenter |
-| Page historique exécution | ⏳ | - | À implémenter |
-| Actions suspend/resume/cancel | ⏳ | - | À implémenter |
+| Page liste instances | ✅ | 2025-11-07 | Material table, filters, pagination, status chips |
+| Page détail instance | ✅ | 2025-11-07 | Tabs (overview, history, variables), actions (suspend/resume/cancel) |
+| Composant visualisation BPMN | ⏳ | - | À implémenter (bpmn-js integration) |
+| Modal variables processus | ✅ | 2025-11-07 | Expansion panel in detail view |
+| Page historique exécution | ✅ | 2025-11-07 | Timeline view in detail tab |
+| Actions suspend/resume/cancel | ✅ | 2025-11-07 | Action buttons with confirmation |
 
 ### Décisions techniques
 - **Architecture:** Sans moteur externe (Camunda optionnel pour Phase future)

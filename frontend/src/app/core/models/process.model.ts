@@ -558,3 +558,142 @@ export interface DailyCompletionTrend {
   dailyCompletions: { [date: string]: number };
   days: number;
 }
+
+// ============================================================================
+// API Key & Webhook Models
+// ============================================================================
+
+/**
+ * API Key
+ */
+export interface ApiKey {
+  id: number;
+  name: string;
+  keyPrefix: string;
+  description?: string;
+  enabled: boolean;
+  expiresAt?: string;
+  lastUsedAt?: string;
+  allowedIps?: string;
+  permissions: string[];
+  rateLimitPerMinute: number;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
+  active: boolean;
+  expired: boolean;
+}
+
+/**
+ * API Key Created Response (includes plain key - shown only once!)
+ */
+export interface ApiKeyCreated {
+  apiKey: ApiKey;
+  plainKey: string;
+  warning: string;
+}
+
+/**
+ * Create API Key Request
+ */
+export interface CreateApiKeyRequest {
+  name: string;
+  description?: string;
+  permissions: string[];
+  rateLimitPerMinute?: number;
+  expiresAt?: string;
+  allowedIps?: string;
+}
+
+/**
+ * Update API Key Request
+ */
+export interface UpdateApiKeyRequest {
+  name?: string;
+  description?: string;
+  permissions?: string[];
+  rateLimitPerMinute?: number;
+  allowedIps?: string;
+}
+
+/**
+ * Webhook
+ */
+export interface Webhook {
+  id: number;
+  name: string;
+  url: string;
+  description?: string;
+  enabled: boolean;
+  events: string[];
+  httpMethod: string;
+  contentType: string;
+  timeoutMs: number;
+  maxRetries: number;
+  retryDelayMs: number;
+  successCount: number;
+  failureCount: number;
+  lastSuccessAt?: string;
+  lastFailureAt?: string;
+  lastError?: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string;
+  updatedBy: string;
+  active: boolean;
+}
+
+/**
+ * Create Webhook Request
+ */
+export interface CreateWebhookRequest {
+  name: string;
+  url: string;
+  description?: string;
+  events: string[];
+  secret?: string;
+  customHeaders?: string;
+  httpMethod?: string;
+  contentType?: string;
+  timeoutMs?: number;
+  maxRetries?: number;
+  retryDelayMs?: number;
+}
+
+/**
+ * Update Webhook Request
+ */
+export interface UpdateWebhookRequest {
+  name?: string;
+  url?: string;
+  description?: string;
+  events?: string[];
+  secret?: string;
+  customHeaders?: string;
+  httpMethod?: string;
+  contentType?: string;
+  timeoutMs?: number;
+  maxRetries?: number;
+  retryDelayMs?: number;
+}
+
+/**
+ * Webhook Delivery
+ */
+export interface WebhookDelivery {
+  id: number;
+  webhookId: number;
+  webhookName: string;
+  eventType: string;
+  requestPayload?: string;
+  httpStatusCode?: number;
+  responseBody?: string;
+  status: string;
+  retryCount: number;
+  errorMessage?: string;
+  durationMs?: number;
+  createdAt: string;
+  completedAt?: string;
+  nextRetryAt?: string;
+}
